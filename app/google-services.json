@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "398261800213",
+    "project_id": "recsysstudentproject",
+    "storage_bucket": "recsysstudentproject.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398261800213:android:280165bbdfd7bb9fcdad1c",
+        "android_client_info": {
+          "package_name": "com.example.movie_rec_sys"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrlzEJWz6i_tWhYM7E8MUdw0OoSv0x6Z8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
