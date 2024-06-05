@@ -12,7 +12,9 @@ import com.example.movie_rec_sys.MyApplication
 import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.data.FirestoreRepository
 import com.example.movie_rec_sys.data.ItemRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RecScreenViewModel(
     private val firestoreRepos: FirestoreRepository,
@@ -28,10 +30,13 @@ class RecScreenViewModel(
     fun fetchRecommendation() {
         viewModelScope.launch {
             val networkResult = firestoreRepos.fetchRecommendation()
+            val title = withContext(Dispatchers.Default) { extractTitle(networkResult) }
+            val items = withContext(Dispatchers.Default) { extractItem(networkResult) }
+
             _generalUiState.value = RecScreenUiState(
                 networkResult.size,
-                extractTitle(networkResult),
-                extractItem(networkResult)
+                title,
+                items
             )
         }
     }
@@ -47,7 +52,7 @@ class RecScreenViewModel(
         }
     }
 
-    private fun extractTitle(hash: List<MutableMap<String, Any>>): List<String> {
+    private suspend fun extractTitle(hash: List<MutableMap<String, Any>>): List<String> {
         return  hash.map { it["category"].toString() }
     }
 
