@@ -13,6 +13,7 @@ import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.data.FirestoreRepository
 import com.example.movie_rec_sys.data.ItemRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -29,15 +30,14 @@ class RecScreenViewModel(
 
     fun fetchRecommendation() {
         viewModelScope.launch {
-            val networkResult = firestoreRepos.fetchRecommendation()
-            val title = withContext(Dispatchers.Default) { extractTitle(networkResult) }
-            val items = withContext(Dispatchers.Default) { extractItem(networkResult) }
-
-            _generalUiState.value = RecScreenUiState(
-                networkResult.size,
-                title,
-                items
-            )
+        firestoreRepos.fetchRecommendation()
+            .collect {
+                _generalUiState.value = RecScreenUiState(
+                    it.size,
+                    withContext(Dispatchers.Default) {extractTitle(it)},
+                    withContext(Dispatchers.Default) {extractItem(it)}
+                )
+            }
         }
     }
 
