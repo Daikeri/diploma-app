@@ -13,7 +13,12 @@ import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.data.FirestoreRepository
 import com.example.movie_rec_sys.data.ItemRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -22,8 +27,8 @@ class RecScreenViewModel(
     private val itemRepos: ItemRepository,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
-    private val _generalUiState = MutableLiveData<RecScreenUiState>()
-    val generalUiState = _generalUiState
+    private val _generalUiState = MutableStateFlow<RecScreenUiState>(RecScreenUiState.getEmptyInstance())
+    val generalUiState: StateFlow<RecScreenUiState> = _generalUiState
 
     private val _cardUiState = MutableLiveData<CardDetailUiState>()
     val cardUiState = _cardUiState
@@ -32,17 +37,23 @@ class RecScreenViewModel(
         viewModelScope.launch {
         firestoreRepos.fetchRecommendation()
             .collect {
+                val (titles, items) = withContext(Dispatchers.Default) {
+                    val titles = extractTitle(it)
+                    val items = extractItem(it)
+                    titles to items
+                }
+
                 _generalUiState.value = RecScreenUiState(
                     it.size,
-                    withContext(Dispatchers.Default) {extractTitle(it)},
-                    withContext(Dispatchers.Default) {extractItem(it)}
+                    titles,
+                    items
                 )
             }
         }
     }
 
     fun onUserChooseItem(id: String) {
-        _generalUiState.value?.cardsContent?.forEach { list ->
+        _generalUiState.value.cardsContent.forEach { list ->
             val result = list.find { card -> card.externalId == id }
             result?.let {
                 _cardUiState.value = CardDetailUiState(

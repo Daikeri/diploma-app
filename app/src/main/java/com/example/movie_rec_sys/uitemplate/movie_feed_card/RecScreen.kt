@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -18,7 +19,7 @@ fun RecScreen(
     viewModel: RecScreenViewModel = viewModel(factory = RecScreenViewModel.Factory),
     toDetail: (String) -> Unit = {}
 ) {
-    val generalUiState by viewModel.generalUiState.observeAsState(RecScreenUiState.getEmptyInstance())
+    val generalUiState by viewModel.generalUiState.collectAsState()
     var needRepeat by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
