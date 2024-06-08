@@ -41,7 +41,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.movie_rec_sys.R
 import com.example.movie_rec_sys.viewmodel.CardDetailUiState
 import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 import android.graphics.Bitmap
@@ -59,7 +58,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-
 
 @Composable
 fun CardDetail(
@@ -100,10 +98,26 @@ fun CardDetail(
                 .fillMaxWidth()
                 .height(300.dp)
         ) {
-            Picture(image = cardUiState.item.posterImage)
+            Picture(image = cardUiState.item.downloadImage)
         }
 
-        ButtonPanel()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Absolute.SpaceAround
+        ) {
+            ButtonSet.content.forEach {
+                with(it) {
+                    ActiveButton(
+                        firestoreCollectionKey = firestoreCollectionKey,
+                        onClick = { value: Map<String, Int> -> viewModel.uploadUpdates(key=value) },
+                        label = label,
+                        iconId = iconId)
+                }
+            }
+        }
+
+        //ButtonPanel()
 
         TagBar(tags, modifier = Modifier.padding(4.dp))
 
@@ -113,6 +127,43 @@ fun CardDetail(
             textAlign = TextAlign.Justify,
             fontSize = 14.sp
         )
+    }
+}
+
+
+@Composable
+fun ActiveButton(
+    firestoreCollectionKey: String,
+    onClick: (Map<String, Int>) -> Unit,
+    label: String,
+    iconId: Int,
+    clickedColor: Color=Color.hsv(31f, 0.74f, 1.00f),
+) {
+    val defaultColor = LocalContentColor.current
+    var isActive by remember { mutableStateOf(false) }
+    val viewedButtonColor by animateColorAsState(
+        targetValue = if (isActive) clickedColor else defaultColor,
+        label = ""
+    )
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        IconButton(
+            onClick = {
+                isActive = !isActive
+                onClick(mapOf(firestoreCollectionKey to 1))
+            }
+        ) {
+            val icon = painterResource(id = iconId)
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                tint = viewedButtonColor
+            )
+        }
+
+        Text(text = label, fontSize = 12.sp, textAlign = TextAlign.Center)
     }
 }
 
@@ -168,79 +219,6 @@ fun TagBar(tags: List<String>, modifier: Modifier) {
         }
     }
 }
-
-@Composable
-fun ButtonPanel() {
-    val clickedColor = Color.hsv(31f, 0.74f, 1.00f)
-    val defaultColor = LocalContentColor.current
-    var isClickedViewed by remember { mutableStateOf(false) }
-    var isClickedMarked by remember { mutableStateOf(false) }
-
-    val viewedButtonColor by animateColorAsState(
-        targetValue = if (isClickedViewed) clickedColor else defaultColor,
-        label = ""
-    )
-    val markedButtonColor by animateColorAsState(
-        targetValue = if (isClickedMarked) clickedColor else defaultColor,
-        label = ""
-    )
-
-    Row(
-        modifier = Modifier
-            .padding(0.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            IconButton(
-                onClick = {
-
-                }
-            ) {
-                val icon = painterResource(id = R.drawable.grade)
-                Icon(
-                    painter = icon,
-                    tint = LocalContentColor.current,
-                    contentDescription = null
-                )
-            }
-            Text(text = "Оценить", fontSize = 12.sp, textAlign = TextAlign.Center)
-        }
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            IconButton(
-                onClick = {
-                    isClickedMarked = !isClickedMarked
-                }
-            ) {
-                val icon = painterResource(id = R.drawable.bookmark)
-                Icon(
-                    painter = icon,
-                    tint = markedButtonColor,
-                    contentDescription = null
-                )
-            }
-            Text(text = "Мое", fontSize = 12.sp, textAlign = TextAlign.Center)
-        }
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            IconButton(
-                onClick = {
-                    isClickedViewed = !isClickedViewed
-                }
-            ) {
-                val icon = painterResource(id = R.drawable.visibility)
-                Icon(
-                    painter = icon,
-                    tint = viewedButtonColor,
-                    contentDescription = null
-                )
-            }
-            Text(text = "Видел", fontSize = 12.sp, textAlign = TextAlign.Center)
-        }
-    }
-}
-
 
 fun blurBitmap(context: Context, imageBitmap: ImageBitmap, radius: Float): ImageBitmap {
     // Получаем Bitmap из ImageBitmap и создаем его копию для обработки RenderScript

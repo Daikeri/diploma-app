@@ -34,4 +34,11 @@ class FirestoreRepository(
 
          awaitClose { request.remove() }
     }.flowOn(Dispatchers.IO)
+
+    suspend fun uploadUpdates(
+        collectionName: String="recommendation",
+        key: Map<String, Int>
+    ) {
+
+    }
 }

@@ -52,6 +52,15 @@ class RecScreenViewModel(
         }
     }
 
+    fun uploadUpdates(
+        collectionName: String="recommendation",
+        key: Map<String, Int>
+    ) {
+        viewModelScope.launch {
+            firestoreRepos.uploadUpdates(collectionName, key)
+        }
+    }
+
     fun onUserChooseItem(id: String) {
         _generalUiState.value.cardsContent.forEach { list ->
             val result = list.find { card -> card.externalId == id }
@@ -67,9 +76,15 @@ class RecScreenViewModel(
         return  hash.map { it["category"].toString() }
     }
 
-    private suspend fun extractItem(hash: List<MutableMap<String, Any>>): List<List<Movie>> {
-        val idsForCategory = hash.mapNotNull { it["items"] as? List<String> }
-        return idsForCategory.map { itemRepos.getUserItems(it) }
+    private suspend fun extractItem(hashes: List<MutableMap<String, Any>>): List<List<Movie>> {
+        return hashes.map { hash ->
+            val key = hash["category"].toString()
+            val items = hash["items"] as List<String>
+            itemRepos.getUserItems(items).map {
+                it.addedInfo.replace(key, true)
+                it
+            }
+        }
     }
 
     companion object {
@@ -114,9 +129,6 @@ data class RecScreenUiState(
 
 data class CardDetailUiState(
     var item: Movie = Movie.emptyInstance(),
-    val rated: Int? = null,
-    val marked: Boolean = false,
-    val viewed: Boolean = false,
 ) {
     companion object {
         fun getEmptyInstance(): CardDetailUiState {

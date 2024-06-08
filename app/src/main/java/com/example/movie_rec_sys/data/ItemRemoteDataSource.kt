@@ -28,7 +28,7 @@ class ItemRemoteDataSource(
     suspend fun fetchItem(id: String, otherApiKey: String=apiKey) : Movie {
         val item = apiImplement.getMovieDetails(otherApiKey, id)
         val downloadResult = downloadImage(item.poster)
-        item.posterImage = downloadResult
+        item.downloadImage = downloadResult
         return item
     }
 

@@ -1,8 +1,6 @@
 package com.example.movie_rec_sys.data
 import com.google.gson.annotations.SerializedName
-import java.util.concurrent.atomic.AtomicInteger
 import androidx.compose.ui.graphics.ImageBitmap
-import java.util.UUID
 
 
 data class Movie(
@@ -19,7 +17,12 @@ data class Movie(
     @SerializedName("Poster") var poster: String,
     @SerializedName("Country") var country: String,
     @SerializedName("imdbRating") var imdbRating: String,
-    var posterImage: ImageBitmap? = null
+    var downloadImage: ImageBitmap? = null,
+    var addedInfo: MutableMap<String, Boolean> = mapOf(
+        "rated" to false,
+        "marked" to false,
+        "viewed" to false
+    ).toMutableMap()
 ) {
     companion object {
         fun emptyInstance(): Movie {
@@ -36,8 +39,7 @@ data class Movie(
                 plot = "",
                 poster = "",
                 country = "",
-                imdbRating = "",
-                posterImage = null
+                imdbRating = ""
             )
         }
     }

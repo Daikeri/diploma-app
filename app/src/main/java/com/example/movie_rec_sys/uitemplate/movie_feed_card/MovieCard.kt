@@ -16,15 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movie_rec_sys.data.Movie
-import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 
 @Composable // 40 symbol max
 fun MovieCard(
     item: Movie,
     toDetail: (String) -> Unit = {},
-    viewModel: RecScreenViewModel = viewModel(factory = RecScreenViewModel.Factory)
 ) {
     OutlinedCard(
         onClick = {
@@ -39,7 +36,7 @@ fun MovieCard(
         Column(
             Modifier.fillMaxSize(),
         ) {
-            item.posterImage?.let {
+            item.downloadImage?.let {
                 Image(
                     bitmap = it,
                     contentDescription = null,

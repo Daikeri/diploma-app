@@ -1,6 +1,5 @@
 package com.example.movie_rec_sys.uitemplate.action
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -28,7 +27,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +36,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -46,10 +43,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.movie_rec_sys.R
 import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.viewmodel.DialogViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun MyDialog(
@@ -115,35 +110,35 @@ fun MyDialog(
                     }
                     composable("1") {
                         BackHandler(true) {}
-                        DialogPoster2(itemCollection[currentItem-1].posterImage)
+                        DialogPoster2(itemCollection[currentItem-1].downloadImage)
                     }
                     composable("2") {
                         BackHandler(true) {
                             dialogNavController.popBackStack()
                             currentItem -= 1
                         }
-                        DialogPoster2(itemCollection[currentItem-1].posterImage)
+                        DialogPoster2(itemCollection[currentItem-1].downloadImage)
                     }
                     composable("3") {
                         BackHandler(true) {
                             dialogNavController.popBackStack()
                             currentItem -= 1
                         }
-                        DialogPoster2(itemCollection[currentItem-1].posterImage)
+                        DialogPoster2(itemCollection[currentItem-1].downloadImage)
                     }
                     composable("4") {
                         BackHandler(true) {
                             dialogNavController.popBackStack()
                             currentItem -= 1
                         }
-                        DialogPoster2(itemCollection[currentItem-1].posterImage)
+                        DialogPoster2(itemCollection[currentItem-1].downloadImage)
                     }
                     composable("5") {
                         BackHandler(true) {
                             dialogNavController.popBackStack()
                             currentItem -= 1
                         }
-                        DialogPoster2(itemCollection[currentItem-1].posterImage)
+                        DialogPoster2(itemCollection[currentItem-1].downloadImage)
                     }
                     composable("6") {
                         LaunchedEffect(key1 = Unit) {
