@@ -18,11 +18,6 @@ data class Movie(
     @SerializedName("Country") var country: String,
     @SerializedName("imdbRating") var imdbRating: String,
     var downloadImage: ImageBitmap? = null,
-    var addedInfo: MutableMap<String, Boolean> = mapOf(
-        "rated" to false,
-        "marked" to false,
-        "viewed" to false
-    ).toMutableMap()
 ) {
     companion object {
         fun emptyInstance(): Movie {

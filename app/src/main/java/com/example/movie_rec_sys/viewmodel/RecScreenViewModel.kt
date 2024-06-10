@@ -37,15 +37,28 @@ class RecScreenViewModel(
         viewModelScope.launch {
         firestoreRepos.fetchRecommendation()
             .collect {
-                val (titles, items) = withContext(Dispatchers.Default) {
+                val (categories, sourceIDs) = withContext(Dispatchers.Default) {
+                    Log.e("Content", "$it")
                     val titles = extractTitle(it)
-                    val items = extractItem(it)
+                    val items = extractItem(it, titles)
                     titles to items
                 }
 
+                val items = withContext(Dispatchers.IO) {
+                    val movies = sourceIDs.map { idS -> itemRepos.getUserItems(idS) }
+                    movies.map { category ->
+                        val sources = category.map { movie ->
+                            movie.externalId
+                        }
+                        val result = sources.zip(category).toMap()
+                        Log.e("Yeap", "${result.javaClass}")
+                        result
+                    }
+                }
+
                 _generalUiState.value = RecScreenUiState(
-                    it.size,
-                    titles,
+                    items.size,
+                    categories,
                     items
                 )
             }
@@ -61,30 +74,39 @@ class RecScreenViewModel(
         }
     }
 
-    fun onUserChooseItem(id: String) {
-        _generalUiState.value.cardsContent.forEach { list ->
-            val result = list.find { card -> card.externalId == id }
-            result?.let {
-                _cardUiState.value = CardDetailUiState(
-                    item = it
-                )
-            }
+    fun onUserChooseItem(category: Int, itemKey: String) {
+        _cardUiState.value = _generalUiState.value.cardsContent[category][itemKey]?.let {
+            CardDetailUiState(
+                item = it
+            )
         }
     }
 
-    private suspend fun extractTitle(hash: List<MutableMap<String, Any>>): List<String> {
-        return  hash.map { it["category"].toString() }
+    private suspend fun extractTitle(hashes: List<MutableMap<String, Any>>): List<String> {
+        val categories = mutableSetOf<String>()
+        hashes.forEach { hash ->
+            hash["category"]?.let { categories.add(it.toString()) }
+        }
+        return categories.toList()
     }
 
-    private suspend fun extractItem(hashes: List<MutableMap<String, Any>>): List<List<Movie>> {
-        return hashes.map { hash ->
-            val key = hash["category"].toString()
-            val items = hash["items"] as List<String>
-            itemRepos.getUserItems(items).map {
-                it.addedInfo.replace(key, true)
-                it
+    private suspend fun extractItem(
+        hashes: List<MutableMap<String, Any>>,
+        categories: List<String>
+    ): List<List<String>> {
+        val sourceIDs = mutableListOf<List<String>>()
+        categories.forEach { category ->
+            val categoryItem = mutableListOf<String>()
+            hashes.forEach { hash ->
+                hash["category"]?.let {
+                    if (it == category)
+                        categoryItem.add(hash["source_item_id"] as String)
+                }
             }
+            sourceIDs.add(categoryItem)
         }
+
+        return sourceIDs
     }
 
     companion object {
@@ -111,7 +133,7 @@ class RecScreenViewModel(
 data class RecScreenUiState(
     val numFeeds: Int,
     val feedsTitle: List<String>,
-    val cardsContent: List<List<Movie>>,
+    val cardsContent: List<Map<String,Movie>>,
     var currentDetailCard: String?=null
 ) {
     companion object {
@@ -129,6 +151,9 @@ data class RecScreenUiState(
 
 data class CardDetailUiState(
     var item: Movie = Movie.emptyInstance(),
+    val marked: Pair<Boolean, Int?> = Pair(false, null),
+    val viewed: Boolean = false,
+    val rated: Boolean = false,
 ) {
     companion object {
         fun getEmptyInstance(): CardDetailUiState {
@@ -136,3 +161,4 @@ data class CardDetailUiState(
         }
     }
 }
+

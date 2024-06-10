@@ -20,12 +20,14 @@ import com.example.movie_rec_sys.data.Movie
 
 @Composable // 40 symbol max
 fun MovieCard(
+    categoryIndex: Int,
+    itemKey: String,
     item: Movie,
-    toDetail: (String) -> Unit = {},
+    toDetail: (Int, String) -> Unit
 ) {
     OutlinedCard(
         onClick = {
-            toDetail(item.externalId)
+            toDetail(categoryIndex, itemKey)
         },
         modifier = Modifier.size(width = 120.dp, height = 240.dp),
         colors = CardDefaults.cardColors(

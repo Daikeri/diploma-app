@@ -17,7 +17,7 @@ import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 @Composable
 fun RecScreen(
     viewModel: RecScreenViewModel = viewModel(factory = RecScreenViewModel.Factory),
-    toDetail: (String) -> Unit = {}
+    toDetail: (Int, String) -> Unit
 ) {
     val generalUiState by viewModel.generalUiState.collectAsState()
     var needRepeat by rememberSaveable { mutableStateOf(false) }
@@ -31,7 +31,7 @@ fun RecScreen(
 
     LazyColumn {
         items(generalUiState.numFeeds) {
-            MovieFeed(generalUiState.cardsContent[it], generalUiState.feedsTitle[it], toDetail)
+            MovieFeed(generalUiState.cardsContent[it], it, generalUiState.feedsTitle[it], toDetail)
         }
     }
 }

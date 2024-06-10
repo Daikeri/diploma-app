@@ -61,7 +61,8 @@ import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun CardDetail(
-    itemID: String="",
+    category: Int,
+    itemKey: String,
     viewModel: RecScreenViewModel = viewModel(factory = RecScreenViewModel.Factory)
 ) {
     val cardUiState by viewModel.cardUiState.observeAsState(CardDetailUiState.getEmptyInstance())
@@ -75,7 +76,7 @@ fun CardDetail(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.onUserChooseItem(itemID)
+        viewModel.onUserChooseItem(category, itemKey)
     }
 
     Column(

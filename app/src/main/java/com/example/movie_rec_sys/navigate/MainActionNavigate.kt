@@ -50,8 +50,8 @@ fun MainActionScreen() {
         ) {
             composable(MainActionRoute.PERSONAL) {
                 RecScreen(
-                    toDetail = { value ->
-                        tabsNavController.navigate("${MainActionRoute.DETAIL}/${value}") {
+                    toDetail = { category, item ->
+                        tabsNavController.navigate("${MainActionRoute.DETAIL}/${category}/${item}") {
                             popUpTo(tabsNavController.graph.findStartDestination().id) {saveState = true}
                             launchSingleTop = true
                             restoreState = true
@@ -63,17 +63,20 @@ fun MainActionScreen() {
             composable(MainActionRoute.SEARCH) {}
             composable(MainActionRoute.PROFILE) {}
             composable(
-                route = "${MainActionRoute.DETAIL}/{movieId}",
-                arguments = listOf(navArgument("movieId") { type = NavType.StringType })
+                route = "${MainActionRoute.DETAIL}/{categoryIndex}/{movieId}",
+                arguments = listOf(
+                    navArgument("categoryIndex") { type = NavType.IntType },
+                    navArgument("movieId") { type = NavType.StringType }
+                )
             ) {
                 val parentEntry = remember(it) {
                     tabsNavController.getBackStackEntry(MainActionRoute.PERSONAL)
                 }
                 val parentViewModel: RecScreenViewModel = viewModel(parentEntry)
-                val movieId = it.arguments?.getString("movieId") ?: ""
-                CardDetail(movieId, viewModel = parentViewModel)
+                val categoryIndex = it.arguments!!.getInt("categoryIndex")
+                val movieId: String = it.arguments!!.getString("movieId") ?: ""
+                CardDetail(categoryIndex, movieId, viewModel = parentViewModel)
             }
-            composable("some") { CardDetail() }
         }
         MyNavBottomBar(tabsNavController)
     }
