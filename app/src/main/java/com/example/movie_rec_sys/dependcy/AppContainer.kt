@@ -8,7 +8,10 @@ import com.example.movie_rec_sys.data.ItemRepository
 import com.example.movie_rec_sys.data.PrimaryRecDataSource
 import com.example.movie_rec_sys.data.PrimaryRecRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.firestoreSettings
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.persistentCacheSettings
 import com.google.firebase.ktx.Firebase
 
 class AppContainer(myApplication: MyApplication) {
@@ -29,5 +32,9 @@ class AppContainer(myApplication: MyApplication) {
 
     init {
         fireBaseRepos.addCallback { fireStoreRepos.setNewUser(it) }
+        val settings = FirebaseFirestoreSettings.Builder()
+            .setPersistenceEnabled(false)
+            .build()
+        fireStore.firestoreSettings = settings
     }
 }
