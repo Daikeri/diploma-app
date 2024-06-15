@@ -61,9 +61,9 @@ import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun CardDetail(
-    category: Int,
-    itemKey: String,
-    viewModel: RecScreenViewModel = viewModel(factory = RecScreenViewModel.Factory)
+    categoryIndex: Int,
+    docID: String,
+    viewModel: RecScreenViewModel = viewModel()
 ) {
     val cardUiState by viewModel.cardUiState.observeAsState(CardDetailUiState.getEmptyInstance())
     val tags by produceState(initialValue = listOf(""), key1 = cardUiState) {
@@ -73,10 +73,6 @@ fun CardDetail(
             cardUiState.item.country.split(", ")[0]
         ).plus(cardUiState.item.genre.split(", "))
         value = items.shuffled()
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.onUserChooseItem(category, itemKey)
     }
 
     Column(
@@ -111,14 +107,24 @@ fun CardDetail(
                 with(it) {
                     ActiveButton(
                         firestoreCollectionKey = firestoreCollectionKey,
-                        onClick = { value: Map<String, Int> -> viewModel.uploadUpdates(key=value) },
+                        actualState = when(firestoreCollectionKey) {
+                            "marked" -> cardUiState.marked
+                            "viewed" -> cardUiState.viewed
+                            else -> false
+                        },
+                        onClick = { firestoreCollection: Pair<String, Any?> ->
+                            val hash = mutableMapOf(
+                                "docID" to docID,
+                                "firestoreCollection" to firestoreCollection.first,
+                                "value" to firestoreCollection.second
+                            )
+                            viewModel.uploadUpdates(key=hash)
+                        },
                         label = label,
                         iconId = iconId)
                 }
             }
         }
-
-        //ButtonPanel()
 
         TagBar(tags, modifier = Modifier.padding(4.dp))
 
@@ -135,13 +141,14 @@ fun CardDetail(
 @Composable
 fun ActiveButton(
     firestoreCollectionKey: String,
-    onClick: (Map<String, Int>) -> Unit,
+    actualState: Boolean,
+    onClick: (Pair<String, Any?>) -> Unit,
     label: String,
     iconId: Int,
     clickedColor: Color=Color.hsv(31f, 0.74f, 1.00f),
 ) {
     val defaultColor = LocalContentColor.current
-    var isActive by remember { mutableStateOf(false) }
+    var isActive by remember { mutableStateOf(actualState) }
     val viewedButtonColor by animateColorAsState(
         targetValue = if (isActive) clickedColor else defaultColor,
         label = ""
@@ -153,7 +160,7 @@ fun ActiveButton(
         IconButton(
             onClick = {
                 isActive = !isActive
-                onClick(mapOf(firestoreCollectionKey to 1))
+                onClick(firestoreCollectionKey to isActive)
             }
         ) {
             val icon = painterResource(id = iconId)

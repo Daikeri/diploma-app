@@ -20,7 +20,7 @@ import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 //@Preview
 @Composable
 fun MovieFeed(
-    cardStates: Map<String, Movie>,
+    cardStates: Map<String, Map<String, Any?>>, // cardStates: Map<String, Movie>
     categoryIndex: Int,
     categoryName: String="Some Category",
     toDetail: (Int, String) -> Unit
@@ -39,8 +39,8 @@ fun MovieFeed(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            items(cardStates.keys.toList()) {itemKey ->
-                MovieCard(categoryIndex, itemKey, cardStates[itemKey]!!, toDetail)
+            items(cardStates.keys.toList()) {docID ->
+                MovieCard(categoryIndex, docID, cardStates[docID]!!, toDetail)
             }
         }
     }

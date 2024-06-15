@@ -32,9 +32,9 @@ class AppContainer(myApplication: MyApplication) {
 
     init {
         fireBaseRepos.addCallback { fireStoreRepos.setNewUser(it) }
-        val settings = FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(false)
-            .build()
-        fireStore.firestoreSettings = settings
+        fireStore.firestoreSettings = firestoreSettings {
+            isPersistenceEnabled = false
+        }
+
     }
 }

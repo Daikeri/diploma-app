@@ -19,4 +19,12 @@ class ItemRepository(
         this.userItems = networkResult
         return this.userItems
     }
+
+    suspend fun getUserItem(id: String): Movie {
+        val networkResult = withContext(Dispatchers.IO) {
+            dataSource.fetchItem(id)
+        }
+        this.userItems.add(networkResult)
+        return networkResult
+    }
 }

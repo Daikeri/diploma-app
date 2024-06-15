@@ -16,18 +16,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movie_rec_sys.data.Movie
+import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 
 @Composable // 40 symbol max
 fun MovieCard(
     categoryIndex: Int,
-    itemKey: String,
-    item: Movie,
-    toDetail: (Int, String) -> Unit
+    docID: String,
+    hash: Map<String, Any?>,
+    toDetail: (Int, String) -> Unit,
+    viewModel: RecScreenViewModel = viewModel()
 ) {
     OutlinedCard(
         onClick = {
-            toDetail(categoryIndex, itemKey)
+            viewModel.onUserChooseItem(categoryIndex, docID)
+            toDetail(categoryIndex, docID)
         },
         modifier = Modifier.size(width = 120.dp, height = 240.dp),
         colors = CardDefaults.cardColors(
@@ -38,7 +42,7 @@ fun MovieCard(
         Column(
             Modifier.fillMaxSize(),
         ) {
-            item.downloadImage?.let {
+            (hash["item"] as Movie).downloadImage?.let {
                 Image(
                     bitmap = it,
                     contentDescription = null,
@@ -53,7 +57,7 @@ fun MovieCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = item.title,
+                    text = (hash["item"] as Movie).title,
                     modifier = Modifier
                         .fillMaxWidth(),
                     textAlign = TextAlign.Center,
