@@ -114,11 +114,11 @@ fun CardDetail(
                         },
                         onClick = { firestoreCollection: Pair<String, Any?> ->
                             val hash = mutableMapOf(
-                                "docID" to docID,
-                                "firestoreCollection" to firestoreCollection.first,
+                                "doc_id" to docID,
+                                "firestore_collection" to firestoreCollection.first,
                                 "value" to firestoreCollection.second
                             )
-                            viewModel.uploadUpdates(key=hash)
+                            viewModel.uploadUpdates(update = hash)
                         },
                         label = label,
                         iconId = iconId)

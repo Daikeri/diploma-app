@@ -3,6 +3,7 @@ package com.example.movie_rec_sys.data
 import android.util.Log
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
@@ -23,9 +24,10 @@ class FirestoreRepository(
         this.currentUser = newVal
     }
 
-    val recommendation:Flow<List<MutableMap<String, Any>>> = callbackFlow {
+    val recommendation:Flow<List<MutableMap<String, Any?>>> = callbackFlow {
         val request = fireStore.collection("recommendation")
             .whereEqualTo("user_id", currentUser?.uid)
+            // по индексу релевантности .orderBy("timestamp", Query.Direction.ASCENDING)
             .addSnapshotListener { snapshot, fireStoreExcept ->
                 if (fireStoreExcept != null) {
                     Log.e("Firestore Exception in Flow", "${fireStoreExcept.message}")
@@ -36,6 +38,7 @@ class FirestoreRepository(
                         val docID = it.document.id
                         val hash = it.document.data
                         hash["doc_id"] = docID
+                        hash["action_flag"] = it.type
                         hash
                     }
                 )
