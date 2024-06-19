@@ -126,8 +126,14 @@ class RecScreenViewModel(
             } else {
                 val targetCategoryIndex = categorySet.indexOfFirst { it == rawHash["category"].toString() }
                 val docID = rawHash["doc_id"].toString()
-                rawHash.remove("doc_id")
-                _generalUiState.value.cardsContent[targetCategoryIndex][docID] = rawHash
+                _generalUiState.value.cardsContent[targetCategoryIndex][docID] =  mutableMapOf(
+                    "doc_id" to rawHash["doc_id"] as String,
+                    "item" to itemRepos.getUserItem(rawHash["source_item_id"] as String),
+                    "marked" to rawHash["marked"] as Boolean,
+                    "viewed" to rawHash["viewed"] as Boolean,
+                    "rated" to rawHash["rated"] as Int?
+                )
+
                 (_generalUiState.value.feedsTitle to _generalUiState.value.cardsContent)
             }
 

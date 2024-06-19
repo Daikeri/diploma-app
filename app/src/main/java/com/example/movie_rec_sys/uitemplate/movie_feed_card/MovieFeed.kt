@@ -39,7 +39,6 @@ fun MovieFeed(
     toDetail: (Int, String) -> Unit,
     viewModel: RecScreenViewModel = viewModel()
 ) {
-    Log.e("UDPATE MOVIE FEED", "ECHO")
     Column {
         Row(
             modifier = Modifier

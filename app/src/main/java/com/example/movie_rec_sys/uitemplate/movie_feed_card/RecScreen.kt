@@ -37,7 +37,6 @@ fun RecScreen(
     toDetail: (Int, String) -> Unit
 ) {
     val generalUiState by viewModel.generalUiState.collectAsState()
-    Log.e("RECOMPOSE REC SCREEN", "YEAP")
     var needRepeat by rememberSaveable { mutableStateOf(false) }
 
     var isRefreshing by remember { mutableStateOf(false) }
@@ -81,9 +80,7 @@ fun RecScreen(
 @Composable
 fun MyLazyColumns(generalUiState:RecScreenUiState, listState: LazyListState, toDetail: (Int, String) -> Unit) {
     LazyColumn(state = listState) {
-        Log.e("RECOMPOSE IN FEED", "ZALYPA")
         items(generalUiState.numFeeds) {
-            Log.e("RECOMPOSE IN FEED", "ZALYPA")
             MovieFeed(generalUiState.cardsContent[it], it, generalUiState.feedsTitle[it], toDetail)
         }
     }
