@@ -23,7 +23,7 @@ class AppContainer(myApplication: MyApplication) {
     val primaryRecRepos = PrimaryRecRepository(dockerDS)
 
     private val itemSource = "http://www.omdbapi.com"
-    private val apiKey =  "f75f8380"//"67bd6ed"
+    private val apiKey =  "67bd6ed"//"67bd6ed" f75f8380
     private val itemDS = ItemRemoteDataSource(itemSource, apiKey, myApplication)
     val itemRepos = ItemRepository(itemDS)
 

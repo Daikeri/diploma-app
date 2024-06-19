@@ -157,7 +157,7 @@ fun SignScreen(
                                 toRecScreen()
                             }
                             else {
-                                Log.e("FIREBASE-VIEWMODEL", "$authResult")
+                                //Log.e("FIREBASE-VIEWMODEL", "$authResult")
                                 snackbarHostState.showSnackbar(message = authResult.exception)
                             }
                         }

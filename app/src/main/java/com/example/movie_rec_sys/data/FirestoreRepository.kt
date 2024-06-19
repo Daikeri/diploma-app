@@ -27,10 +27,9 @@ class FirestoreRepository(
     val recommendation:Flow<List<MutableMap<String, Any?>>> = callbackFlow {
         val request = fireStore.collection("recommendation")
             .whereEqualTo("user_id", currentUser?.uid)
-            // по индексу релевантности .orderBy("timestamp", Query.Direction.ASCENDING)
+            .orderBy("relevance_index", Query.Direction.ASCENDING)
             .addSnapshotListener { snapshot, fireStoreExcept ->
                 if (fireStoreExcept != null) {
-                    Log.e("Firestore Exception in Flow", "${fireStoreExcept.message}")
                     return@addSnapshotListener
                 }
                 trySend(
@@ -39,6 +38,7 @@ class FirestoreRepository(
                         val hash = it.document.data
                         hash["doc_id"] = docID
                         hash["action_flag"] = it.type
+                        //Log.e("REPOSITORY", "${hash["relevance_index"]}")
                         hash
                     }
                 )

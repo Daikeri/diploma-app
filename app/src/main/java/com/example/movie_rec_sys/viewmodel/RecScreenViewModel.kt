@@ -1,6 +1,5 @@
 package com.example.movie_rec_sys.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -40,24 +39,38 @@ class RecScreenViewModel(
         collectionRecommendation = viewModelScope.launch {
         firestoreRepos.recommendation
             .collect { rawHashes ->
-                Log.e("Flow Content", "$rawHashes")
-
                 if (!firstExtraction) {
                     initializeUiState(rawHashes)
                     firstExtraction = true
                 } else {
                     rawHashes.forEach { newDoc ->
-                        when(newDoc["action_flag"].toString()) {
-                            "ADDED", "REMOVED" -> updatesPool.add(newDoc)
-                            "MODIFIED" -> updateUiState(newDoc)
+                        if (newDoc["init_doc"] == null) {
+                            when(newDoc["action_flag"].toString()) {
+                                "ADDED", "REMOVED" -> updatesPool.add(newDoc)
+                                "MODIFIED" -> updateUiState(newDoc)
+                            }
                         }
                     }
                 }
             }
         }
     }
+
+    suspend fun applyUpdatesFromPool() {
+        lateinit var acc: RecScreenUiState
+        updatesPool.forEach { update ->
+            when(update["action_flag"].toString()) {
+                "REMOVED" -> {
+                    val result = removeFromUiState(update)
+                    _generalUiState.value = result
+                }
+                "ADDED" -> _generalUiState.value = appendTheUiState(update)
+            }
+        }
+        updatesPool.clear()
+    }
+
     private suspend fun updateUiState(rawHash: MutableMap<String, Any?>) {
-        Log.e("Update UI State", "I'm HERE")
         val newState = withContext(Dispatchers.Default) {
             val categorySet = _generalUiState.value.feedsTitle
             val targetItemIndex = categorySet.indexOfFirst { it == rawHash["category"].toString() }
@@ -74,7 +87,7 @@ class RecScreenViewModel(
         _generalUiState.value = newState
     }
 
-    private suspend fun removeFromUiState(rawHash: MutableMap<String, Any?>) {
+    private suspend fun removeFromUiState(rawHash: MutableMap<String, Any?>):RecScreenUiState {
         val newState = withContext(Dispatchers.Default) {
             val categorySet = _generalUiState.value.feedsTitle
             val targetItemIndex = categorySet.indexOfFirst { it == rawHash["category"].toString() }
@@ -82,44 +95,49 @@ class RecScreenViewModel(
             val indexNonEmpty = _generalUiState.value.cardsContent
                 .mapIndexedNotNull  { index, linkedHashMap ->
                     if (linkedHashMap.isNotEmpty()) index else null
-            }
+                }
 
             val newState = indexNonEmpty.map {
                 (_generalUiState.value.feedsTitle[it] to _generalUiState.value.cardsContent[it])
             }
 
-            RecScreenUiState(
+            val result = RecScreenUiState(
                 numFeeds = newState.size,
                 feedsTitle = newState.map { it.first },
                 cardsContent =  newState.map { it.second }
             )
+
+            result
         }
-        _generalUiState.value = newState
+        return newState
     }
 
-    suspend fun appendTheUiState(rawHash: MutableMap<String, Any?>) {
-        val categorySet = _generalUiState.value.feedsTitle
-        val targetCategoryName = categorySet.find { it == rawHash["category"].toString() }
-        val (newFeeds, newCardsContent) = if (targetCategoryName == null) {
-            val newCategory = rawHash["category"].toString()
-            val updatedTitle = _generalUiState.value.feedsTitle + listOf(newCategory)
-            val docID = rawHash["doc_id"].toString()
-            rawHash.remove("doc_id")
-            val updatedCardsContent = _generalUiState.value.cardsContent + listOf(linkedMapOf(docID to rawHash))
-            (updatedTitle to updatedCardsContent)
-        } else {
-            val targetCategoryIndex = categorySet.indexOfFirst { it == rawHash["category"].toString() }
-            val docID = rawHash["doc_id"].toString()
-            rawHash.remove("doc_id")
-            _generalUiState.value.cardsContent[targetCategoryIndex][docID] = rawHash
-            (_generalUiState.value.feedsTitle to _generalUiState.value.cardsContent)
-        }
+    suspend fun appendTheUiState(rawHash: MutableMap<String, Any?>): RecScreenUiState {
+        val newState = withContext(Dispatchers.Default) {
+            val categorySet = _generalUiState.value.feedsTitle
+            val targetCategoryName = categorySet.find { it == rawHash["category"].toString() }
+            val (newFeeds, newCardsContent) = if (targetCategoryName == null) {
+                val newCategory = rawHash["category"].toString()
+                val updatedTitle = _generalUiState.value.feedsTitle + listOf(newCategory)
+                val docID = rawHash["doc_id"].toString()
+                rawHash.remove("doc_id")
+                val updatedCardsContent = _generalUiState.value.cardsContent + listOf(linkedMapOf(docID to rawHash))
+                (updatedTitle to updatedCardsContent)
+            } else {
+                val targetCategoryIndex = categorySet.indexOfFirst { it == rawHash["category"].toString() }
+                val docID = rawHash["doc_id"].toString()
+                rawHash.remove("doc_id")
+                _generalUiState.value.cardsContent[targetCategoryIndex][docID] = rawHash
+                (_generalUiState.value.feedsTitle to _generalUiState.value.cardsContent)
+            }
 
-        RecScreenUiState(
-            numFeeds = newFeeds.size,
-            feedsTitle = newFeeds,
-            cardsContent = newCardsContent
-        )
+            RecScreenUiState(
+                numFeeds = newFeeds.size,
+                feedsTitle = newFeeds,
+                cardsContent = newCardsContent
+            )
+        }
+        return newState
     }
 
 
@@ -128,8 +146,6 @@ class RecScreenViewModel(
         val cardStates = extractCardStates(rawHashes, titles)
         val uiItems = fetchExternalContent(cardStates)
         val newIndex = indexation(uiItems)
-
-        Log.e("New format", "$newIndex")
 
         _generalUiState.value = RecScreenUiState(
             numFeeds = newIndex.size,
@@ -218,12 +234,7 @@ class RecScreenViewModel(
         }
     }
 
-    fun addTheUpdatesPool(
-        collectionName: String="shared_pool",
-        key: MutableMap<String, Any?>
-    ) {
 
-    }
 
     fun onUserChooseItem(category: Int, itemKey: String) {
         _cardUiState.value = _generalUiState.value.cardsContent[category][itemKey]?.let {

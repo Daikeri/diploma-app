@@ -1,5 +1,6 @@
 package com.example.movie_rec_sys.uitemplate.movie_feed_card
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,8 +36,10 @@ fun MovieFeed(
     cardStates: Map<String, Map<String, Any?>>, // cardStates: Map<String, Movie>
     categoryIndex: Int,
     categoryName: String="Some Category",
-    toDetail: (Int, String) -> Unit
+    toDetail: (Int, String) -> Unit,
+    viewModel: RecScreenViewModel = viewModel()
 ) {
+    Log.e("UDPATE MOVIE FEED", "ECHO")
     Column {
         Row(
             modifier = Modifier

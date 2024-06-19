@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -35,6 +37,7 @@ fun RecScreen(
     toDetail: (Int, String) -> Unit
 ) {
     val generalUiState by viewModel.generalUiState.collectAsState()
+    Log.e("RECOMPOSE REC SCREEN", "YEAP")
     var needRepeat by rememberSaveable { mutableStateOf(false) }
 
     var isRefreshing by remember { mutableStateOf(false) }
@@ -45,10 +48,10 @@ fun RecScreen(
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = {
-            if (listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0) {
+            if (listState.firstVisibleItemScrollOffset == 0) {
                 scope.launch {
                     isRefreshing = true
-                    delay(5_000L)
+                    viewModel.applyUpdatesFromPool()
                     isRefreshing = false
                 }
             }
@@ -65,16 +68,23 @@ fun RecScreen(
         modifier = Modifier
             .pullRefresh(pullRefreshState)
     ) {
-        LazyColumn(state = listState) {
-            items(generalUiState.numFeeds) {
-                MovieFeed(generalUiState.cardsContent[it], it, generalUiState.feedsTitle[it], toDetail)
-            }
-        }
+        MyLazyColumns(generalUiState, listState, toDetail)
 
         PullRefreshIndicator(
             refreshing = isRefreshing,
             state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter)
         )
+    }
+}
+
+@Composable
+fun MyLazyColumns(generalUiState:RecScreenUiState, listState: LazyListState, toDetail: (Int, String) -> Unit) {
+    LazyColumn(state = listState) {
+        Log.e("RECOMPOSE IN FEED", "ZALYPA")
+        items(generalUiState.numFeeds) {
+            Log.e("RECOMPOSE IN FEED", "ZALYPA")
+            MovieFeed(generalUiState.cardsContent[it], it, generalUiState.feedsTitle[it], toDetail)
+        }
     }
 }
