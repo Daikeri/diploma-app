@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -33,11 +34,15 @@ fun MovieCard(
             viewModel.onUserChooseItem(categoryIndex, docID)
             toDetail(categoryIndex, docID)
         },
-        modifier = Modifier.size(width = 120.dp, height = 240.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            containerColor = MaterialTheme.colorScheme.primary,
         ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 6.dp)
+            .size(width = 120.dp, height = 240.dp)
     ) {
         Column(
             Modifier.fillMaxSize(),
@@ -62,7 +67,7 @@ fun MovieCard(
                         .fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }

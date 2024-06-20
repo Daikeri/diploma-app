@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
@@ -70,11 +72,9 @@ fun SignScreen(
     var correctInputGeneral by remember { mutableStateOf(correctInputEmail && correctInputPassword) }
     var buttonLock by remember { mutableStateOf(correctInputGeneral) }
 
-
-
     Column(
         modifier = Modifier.fillMaxSize()
-            .background(MaterialTheme.colorScheme.primaryContainer),
+            .background(MaterialTheme.colorScheme.surface),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -90,14 +90,18 @@ fun SignScreen(
         )
         Card(
             modifier = Modifier
-                .width(325.dp)
-                .height(350.dp),
+                .height(200.dp)
+                .width(325.dp),
             colors = CardColors(
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                contentColor =  MaterialTheme.colorScheme.onTertiaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
-            )
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor =  MaterialTheme.colorScheme.onPrimaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 10.dp
+            ),
+
         ) {
             Column(
                 modifier = Modifier
@@ -138,11 +142,6 @@ fun SignScreen(
                     visualTransformation = PasswordVisualTransformation(),
                     label = { Text(text = "Password") }
                 )
-
-                Column {
-                    DropdownMenuWithLabel("Пол", listOf("Мужской", "Женский"))
-                    DropdownMenuWithLabel("Возраст", listOf("18-25", "25-40", "40-70"))
-                }
 
                 Button(
                     onClick = {

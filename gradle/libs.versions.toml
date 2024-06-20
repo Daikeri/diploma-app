@@ -24,6 +24,7 @@ runtime = "1.6.5"
 lifecycleLivedata = "2.7.0"
 ui = "1.6.5"
 firebaseFirestoreKtx = "25.0.0"
+uiTextGoogleFonts = "1.6.8"
 
 [libraries]
 
@@ -60,6 +61,7 @@ runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", versi
 androidx-lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata", version.ref = "lifecycleLivedata" }
 ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
