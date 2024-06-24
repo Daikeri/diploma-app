@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -41,6 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -72,11 +74,9 @@ fun SignScreen(
     var correctInputGeneral by remember { mutableStateOf(correctInputEmail && correctInputPassword) }
     var buttonLock by remember { mutableStateOf(correctInputGeneral) }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         SnackbarHost(
             snackbarHostState,
@@ -84,12 +84,16 @@ fun SignScreen(
                 Snackbar(
                     snackbarData = it,
                     containerColor = MaterialTheme.colorScheme.error,
-                    contentColor = MaterialTheme.colorScheme.onError
+                    contentColor = MaterialTheme.colorScheme.onError,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
                 )
-            }
+            },
+
         )
         Card(
             modifier = Modifier
+                .align(Alignment.Center)
                 .height(200.dp)
                 .width(325.dp),
             colors = CardColors(
@@ -102,7 +106,7 @@ fun SignScreen(
                 defaultElevation = 10.dp
             ),
 
-        ) {
+            ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -148,15 +152,12 @@ fun SignScreen(
                         localScope.launch {
                             if (fillingAuthButton == "Sign up") {
                                 viewModel.addNewUser(email, password)
-                            }
-                            else {
+                            } else {
                                 viewModel.authExistUser(email, password)
                             }
                             if (authResult.success){
                                 toRecScreen()
-                            }
-                            else {
-                                //Log.e("FIREBASE-VIEWMODEL", "$authResult")
+                            } else {
                                 snackbarHostState.showSnackbar(message = authResult.exception)
                             }
                         }
@@ -165,61 +166,6 @@ fun SignScreen(
                     enabled = buttonLock
                 ) {
                     Text(fillingAuthButton)
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
-fun DropdownMenuWithLabel(label: String, options: List<String>) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf("Option 1") }
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .height(80.dp)
-    ) {
-        Text(
-            text = "$label:",
-            fontSize = 18.sp,
-            modifier = Modifier
-                .width(85.dp) // Фиксированная ширина для лейбла
-                .padding(end = 8.dp)
-        )
-        Box(
-            modifier = Modifier
-                .width(200.dp) // Фиксированная ширина для выпадающего списка
-        ) {
-            Text(
-                text = selectedOption,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expanded = true }
-                    .padding(16.dp)
-                    .border(
-                        1.dp,
-                        MaterialTheme.colorScheme.primary,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .padding(8.dp)
-            )
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                options.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option) },
-                        onClick = {
-                            selectedOption = option
-                            expanded = false
-                        },
-                        modifier = Modifier.padding(4.dp)
-                    )
                 }
             }
         }

@@ -19,7 +19,6 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 Surface(
                     color = MaterialTheme.colorScheme.surface,
-                    elevation = 8.dp
                 ) {
                     Navigate(application as MyApplication)
                 }

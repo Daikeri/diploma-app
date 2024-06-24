@@ -68,7 +68,7 @@ fun GeneralScreen(
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 20.dp)
                 ) {
                     Text(
-                        text="Sign in",
+                        text="Log in",
                     )
                 }
 

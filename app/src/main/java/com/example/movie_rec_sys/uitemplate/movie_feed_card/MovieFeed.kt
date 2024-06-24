@@ -55,8 +55,8 @@ fun MovieFeed(
     ) {
         Surface(
             elevation = 10.dp,
-            color = MaterialTheme.colorScheme.surface,
-            shape = RoundedCornerShape(28.dp),
+            color = MaterialTheme.colorScheme.surfaceContainerLowest,
+            //shape = RoundedCornerShape(28.dp),
             modifier = Modifier,
             //.padding(bottom = 15.dp)
 
