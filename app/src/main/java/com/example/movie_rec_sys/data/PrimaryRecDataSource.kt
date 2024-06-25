@@ -28,7 +28,7 @@ class PrimaryRecDataSource(
 }
 
 interface ItemBasedFiltration {
-    @GET("getRec")
+    @GET("primary_rec")
     suspend fun getRec(): MutableMap<String, MutableMap<String, Any?>>
 
     @POST("feedback")

@@ -7,6 +7,7 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.example.movie_rec_sys.MyApplication
 import com.example.movie_rec_sys.uitemplate.action.MyDialog
+import com.example.movie_rec_sys.uitemplate.action.UpdatedSurveyDialog
 import com.example.movie_rec_sys.uitemplate.authorization.AgeGroupScreen
 import com.example.movie_rec_sys.uitemplate.authorization.GenderScreen
 import com.example.movie_rec_sys.uitemplate.authorization.GeneralScreen
@@ -14,8 +15,8 @@ import com.example.movie_rec_sys.uitemplate.authorization.SignScreen
 
 @Composable
 fun Navigate(app: MyApplication) {
-    val startDestination = //"choose_age_group"
-       if (app.appContainer.fireBaseRepos.userExists()) "recommend-screen" else "general screen"
+    val startDestination = "recommend-dialog"//"choose_age_group"
+       //if (app.appContainer.fireBaseRepos.userExists()) "recommend-screen" else "general screen"
     val navController = rememberNavController()
 
     NavHost(
@@ -47,7 +48,8 @@ fun Navigate(app: MyApplication) {
             AgeGroupScreen()
         }
         dialog("recommend-dialog") {
-            MyDialog({navController.navigate("recommend-screen")})
+            UpdatedSurveyDialog()
+            //MyDialog({navController.navigate("recommend-screen")})
         }
 
         composable("recommend-screen") {

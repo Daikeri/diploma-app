@@ -77,7 +77,7 @@ fun MyDialog(
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(28.dp),
+            shape = RoundedCornerShape(12.dp),
         ) {
 
             Column(
@@ -102,7 +102,7 @@ fun MyDialog(
                         .padding(bottom = 5.dp)
                         .height(250.dp)
                         .width(170.dp)
-                        .clip(RoundedCornerShape(28.dp)),
+                        .clip(RoundedCornerShape(12.dp)),
                 ) {
                     composable("0") {
                         BackHandler(true) {}
