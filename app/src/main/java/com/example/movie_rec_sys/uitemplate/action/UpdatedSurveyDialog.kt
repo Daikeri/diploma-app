@@ -46,19 +46,27 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movie_rec_sys.viewmodel.DialogUiState
+import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 import com.example.movie_rec_sys.viewmodel.UpdatedDialogViewModel
 
 @Composable
 fun UpdatedSurveyDialog(
-    viewModel: UpdatedDialogViewModel = viewModel(factory = UpdatedDialogViewModel.Factory)
+    viewModel: UpdatedDialogViewModel = viewModel(factory = UpdatedDialogViewModel.Factory),
+    externalViewModel: RecScreenViewModel = viewModel(factory = RecScreenViewModel.Factory),
+    onRecDownload: () -> Unit
 ) {
     val uiState: DialogUiState by viewModel.uiState.observeAsState(DialogUiState.getEmptyInstance())
+    val recDownload: Boolean by viewModel.recommendationDownload.observeAsState(initial = false)
     val density = LocalDensity.current
 
     LaunchedEffect(Unit) {
         viewModel.getItems()
     }
 
+    LaunchedEffect(recDownload) {
+        if (recDownload)
+            onRecDownload()
+    }
 
     Dialog(
         onDismissRequest = {},

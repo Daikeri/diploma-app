@@ -24,6 +24,9 @@ class UpdatedDialogViewModel(
     private val _uiState: MutableLiveData<DialogUiState> = MutableLiveData()
     val uiState: LiveData<DialogUiState> = _uiState
 
+    private val  _recommendationDownload: MutableLiveData<Boolean> = MutableLiveData()
+    val recommendationDownload = _recommendationDownload
+
     private lateinit var sourceResponse: MutableMap<String, MutableMap<String, Any?>>
     private lateinit var movies: List<Movie>
     private var currentItemIndex = 0
@@ -49,6 +52,12 @@ class UpdatedDialogViewModel(
                     loading = false,
                     item = movies[currentItemIndex]
                 )
+            } else {
+                _uiState.value = DialogUiState(
+                    loading = true,
+                    item = null
+                )
+                sendFeedback()
             }
         } else {
             if (currentItemIndex > 0) {
@@ -64,6 +73,12 @@ class UpdatedDialogViewModel(
     fun markItem(action: Boolean) {
         sourceResponse.values.toList()[currentItemIndex]["mark"] = action
         Log.e("ITEM STATE AFTER MARK", "${sourceResponse.values}")
+    }
+
+    private fun sendFeedback() {
+        viewModelScope.launch {
+            primaryRepos.sendFeedback(sourceResponse)
+        }
     }
 
 
