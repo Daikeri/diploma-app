@@ -1,7 +1,13 @@
 package com.example.movie_rec_sys.uitemplate.authorization
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -9,12 +15,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowRight
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -31,18 +41,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.movie_rec_sys.R
+import kotlinx.coroutines.delay
 
 @Composable
-fun GenderScreen() {
+fun GenderScreen()  {
     var choose by remember { mutableStateOf(false) }
 
-    var dynamicHeight = if (choose) 250.dp else 200.dp
+    var dynamicHeight = if (choose) 260.dp else 190.dp
 
     val animateHeight by animateDpAsState(targetValue = dynamicHeight, label = "")
 
@@ -53,59 +65,84 @@ fun GenderScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-       Card(
-           modifier = Modifier
-               .height(animateHeight)
-               .width(330.dp),
-           colors = CardColors(
-               containerColor = MaterialTheme.colorScheme.primaryContainer,
-               contentColor =  MaterialTheme.colorScheme.onPrimaryContainer,
-               disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-               disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-           ),
-           elevation = CardDefaults.cardElevation(
-               defaultElevation = 10.dp
-           ),
-       ) {
-           Box(
-               modifier = Modifier
-                   .fillMaxSize()
-                   .padding(start = 16.dp, end = 16.dp, bottom = 24.dp, top = 8.dp)
-           ) {
-               Text(
-                   text = "Выберите ваш пол",
-                   style = MaterialTheme.typography.titleLarge,
-                   color = MaterialTheme.colorScheme.onPrimaryContainer,
-                   textAlign = TextAlign.Center,
-                   modifier = Modifier
-                       .padding(top = 6.dp)
-                       .align(Alignment.TopCenter)
-               )
-               Row(
-                   horizontalArrangement = Arrangement.spacedBy(8.dp),
-                   modifier = Modifier
-                       .align(Alignment.BottomCenter)
-               ) {
-                   CardWithIcon(image = R.drawable.male, label = "Мужской", false) {
-                       choose = !choose
-                   }
-                   CardWithIcon(image = R.drawable.female, label = "Женский", false ) {
-                       choose = !choose
-                   }
-               }
-           }
-           if (choose) {
-               Row(
-                   horizontalArrangement = Arrangement.Center,
-                   verticalAlignment = Alignment.CenterVertically,
-                   modifier = Modifier
-               ) {
-                   IconButton(onClick = { /*TODO*/ }) {
-                       Icons.AutoMirrored.Default.KeyboardArrowRight
-                   }
-               }
-           }
-       }
+        Card(
+            modifier = Modifier
+                .height(animateHeight)
+                .width(310.dp),
+            colors = CardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor =  MaterialTheme.colorScheme.onPrimaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 10.dp
+            ),
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp, bottom = 0.dp, top = 0.dp)
+                        .align(Alignment.TopCenter)
+
+                ) {
+                    Text(
+                        text = "Ваш пол",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(top = 10.dp, bottom = 16.dp)
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+
+                    ) {
+                        CardWithIcon(image = R.drawable.male, label = "Мужской", false, 125, 110) {
+                            choose = !choose
+                        }
+                        CardWithIcon(image = R.drawable.female, label = "Женский", false, 125, 110) {
+                            choose = !choose
+                        }
+                    }
+                }
+
+                Crossfade(
+                    targetState = choose,
+                    animationSpec = tween(easing = FastOutSlowInEasing, durationMillis = 20, delayMillis = 5),
+                    label = "",
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                ) {
+                    if (it) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                        ) {
+                            Button(
+                                shape = RoundedCornerShape(
+                                    topStart = 0.dp,
+                                    bottomStart = 12.dp,
+                                    topEnd = 0.dp,
+                                    bottomEnd = 12.dp
+                                ),
+                                onClick = { },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Image(painter = painterResource(id = R.drawable.arrow_forward_base), contentDescription = null )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -150,7 +187,7 @@ fun AgeGroupScreen() {
                ) {
                    Text(
                        text = "Ваша возрастная группа",
-                       style = MaterialTheme.typography.titleLarge,
+                       style = MaterialTheme.typography.titleMedium,
                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                        textAlign = TextAlign.Center,
                        modifier = Modifier
@@ -161,30 +198,48 @@ fun AgeGroupScreen() {
                        modifier = Modifier
 
                    ) {
-                       CardWithIcon(image = R.drawable.boy, label = "до 25", false) {
+                       CardWithIcon(image = R.drawable.boy, label = "до 25", false, 120, 85) {
                            choose = !choose
                        }
-                       CardWithIcon(image = R.drawable.man, label = "25-49", false ) {
+                       CardWithIcon(image = R.drawable.man, label = "25-49", false, 120, 85) {
                            choose = !choose
                        }
-                       CardWithIcon(image = R.drawable.elderly, label = "50+", false) {
+                       CardWithIcon(image = R.drawable.elderly, label = "50+", false, 120, 85) {
                            choose = !choose
                        }
                    }
                }
-               if (choose) {
-                   Log.e("Choose", "${choose}")
-                   Row(
-                       verticalAlignment = Alignment.CenterVertically,
-                       horizontalArrangement = Arrangement.Center,
-                       modifier = Modifier
-                           .align(Alignment.BottomCenter)
-                   ) {
-                       IconButton(onClick = { /*TODO*/ }) {
-                           Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Информация о приложении")
-                       }
-                   }
-               }
+
+              Crossfade(
+                  targetState = choose,
+                  animationSpec = tween(easing = FastOutSlowInEasing, durationMillis = 20, delayMillis = 5),
+                  label = "",
+                  modifier = Modifier
+                      .align(Alignment.BottomCenter)
+              ) {
+                  if (it) {
+                      Row(
+                          verticalAlignment = Alignment.CenterVertically,
+                          horizontalArrangement = Arrangement.Center,
+                          modifier = Modifier
+                              .align(Alignment.BottomCenter)
+                      ) {
+                          Button(
+                              shape = RoundedCornerShape(
+                                  topStart = 0.dp,
+                                  bottomStart = 12.dp,
+                                  topEnd = 0.dp,
+                                  bottomEnd = 12.dp
+                              ),
+                              onClick = { },
+                              modifier = Modifier
+                                  .fillMaxWidth()
+                          ) {
+                              Image(painter = painterResource(id = R.drawable.arrow_forward_base), contentDescription = null )
+                          }
+                      }
+                  }
+              }
            }
         }
     }
@@ -195,6 +250,8 @@ fun CardWithIcon(
     image: Int,
     label: String,
     initialState: Boolean,
+    height: Int,
+    width: Int,
     onChooseChange: () -> Unit
 ) {
     var enabled by remember { mutableStateOf(initialState) }
@@ -214,8 +271,8 @@ fun CardWithIcon(
             defaultElevation = 5.dp
         ) ,
         modifier = Modifier
-            .height(120.dp)
-            .width(85.dp)
+            .height(height.dp)
+            .width(width.dp)
             .then(if (enabled) Modifier.alpha(1.0f) else Modifier.alpha(0.38f))
     ) {
         Column(

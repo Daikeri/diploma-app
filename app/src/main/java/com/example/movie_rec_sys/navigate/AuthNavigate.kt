@@ -15,7 +15,7 @@ import com.example.movie_rec_sys.uitemplate.authorization.SignScreen
 
 @Composable
 fun Navigate(app: MyApplication) {
-    val startDestination = "choose_age_group"//"recommend-dialog"//"choose_age_group"
+    val startDestination = "choose_gender"//"recommend-dialog"//"choose_age_group" choose_gender
        //if (app.appContainer.fireBaseRepos.userExists()) "recommend-screen" else "general screen"
     val navController = rememberNavController()
 
