@@ -47,11 +47,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movie_rec_sys.R
+import com.example.movie_rec_sys.viewmodel.AuthViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun GenderScreen()  {
+fun GenderScreen(
+    viewModel: AuthViewModel,
+    toNextScreen: () -> Unit
+)  {
+    Log.e("viewModel", "${viewModel.hashCode()}")
     var choose by remember { mutableStateOf(false) }
 
     var dynamicHeight = if (choose) 260.dp else 190.dp
@@ -102,12 +108,22 @@ fun GenderScreen()  {
                         modifier = Modifier
 
                     ) {
-                        CardWithIcon(image = R.drawable.male, label = "Мужской", false, 125, 110) {
-                            choose = !choose
-                        }
-                        CardWithIcon(image = R.drawable.female, label = "Женский", false, 125, 110) {
-                            choose = !choose
-                        }
+                        CardWithIcon(
+                            image = R.drawable.male,
+                            label = "Мужской",
+                            false, 125,
+                            110,
+                            onChooseChange = { choose = !choose },
+                            addKey = { viewModel.addMetaData("gender", "M") }
+                        )
+                        CardWithIcon(
+                            image = R.drawable.female,
+                            label = "Женский",
+                            false, 125,
+                            110,
+                            onChooseChange = { choose = !choose },
+                            addKey = { viewModel.addMetaData("gender", "F") }
+                        )
                     }
                 }
 
@@ -132,7 +148,7 @@ fun GenderScreen()  {
                                     topEnd = 0.dp,
                                     bottomEnd = 12.dp
                                 ),
-                                onClick = { },
+                                onClick = { toNextScreen() },
                                 modifier = Modifier
                                     .fillMaxWidth()
                             ) {
@@ -148,7 +164,11 @@ fun GenderScreen()  {
 
 // 120 а 85 для карточки возрастов
 @Composable
-fun AgeGroupScreen() {
+fun AgeGroupScreen(
+    viewModel: AuthViewModel,
+    toNextScreen: () -> Unit
+) {
+    Log.e("viewModel", "${viewModel.hashCode()}")
     var choose by remember { mutableStateOf(false) }
 
     var dynamicHeight = if (choose) 260.dp else 190.dp
@@ -198,15 +218,33 @@ fun AgeGroupScreen() {
                        modifier = Modifier
 
                    ) {
-                       CardWithIcon(image = R.drawable.boy, label = "до 25", false, 120, 85) {
-                           choose = !choose
-                       }
-                       CardWithIcon(image = R.drawable.man, label = "25-49", false, 120, 85) {
-                           choose = !choose
-                       }
-                       CardWithIcon(image = R.drawable.elderly, label = "50+", false, 120, 85) {
-                           choose = !choose
-                       }
+                       CardWithIcon(
+                           image = R.drawable.boy,
+                           label = "до 25",
+                           false,
+                           120,
+                           85,
+                           onChooseChange = { choose = !choose },
+                           addKey = { viewModel.addMetaData("age", "up_to_25") }
+                       )
+                       CardWithIcon(
+                           image = R.drawable.man,
+                           label = "25-49",
+                           false,
+                           120,
+                           85,
+                           onChooseChange = { choose = !choose },
+                           addKey = { viewModel.addMetaData("age", "25_49") }
+                       )
+                       CardWithIcon(
+                           image = R.drawable.elderly,
+                           label = "50+",
+                           false,
+                           120,
+                           85,
+                           onChooseChange = { choose = !choose },
+                           addKey = { viewModel.addMetaData("age", "50_or_more") }
+                       )
                    }
                }
 
@@ -231,7 +269,10 @@ fun AgeGroupScreen() {
                                   topEnd = 0.dp,
                                   bottomEnd = 12.dp
                               ),
-                              onClick = { },
+                              onClick = {
+                                  viewModel.uploadMetaData()
+                                  toNextScreen()
+                              },
                               modifier = Modifier
                                   .fillMaxWidth()
                           ) {
@@ -252,7 +293,8 @@ fun CardWithIcon(
     initialState: Boolean,
     height: Int,
     width: Int,
-    onChooseChange: () -> Unit
+    onChooseChange: () -> Unit,
+    addKey: () -> Unit
 ) {
     var enabled by remember { mutableStateOf(initialState) }
 
@@ -260,6 +302,7 @@ fun CardWithIcon(
         onClick = {
             enabled = !enabled
             onChooseChange()
+            addKey()
         },
         colors = CardColors(
             containerColor = MaterialTheme.colorScheme.primary,

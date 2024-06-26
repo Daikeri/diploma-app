@@ -66,6 +66,25 @@ class FirestoreRepository(
         }
     }
 
+    suspend fun uploadMetaData(
+        hash: MutableMap<String, Any?>,
+        collectionName: String="users_profiles",
+    ) {
+        hash["user_id"] = currentUser!!.uid
+        withContext(Dispatchers.IO) {
+            fireStore.collection(collectionName)
+                .add(hash)
+                .addOnSuccessListener {
+                    fireStore.waitForPendingWrites()
+                    Log.d("Firestore Repos", "Data uploaded successfully")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("Firestore Repos", "Error uploading data", e)
+                }
+                .await()
+        }
+    }
+
     /*
      fun fetchRecommendation(
          collectionName: String="recommendation"

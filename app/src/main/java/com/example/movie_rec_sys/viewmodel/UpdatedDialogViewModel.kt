@@ -58,6 +58,7 @@ class UpdatedDialogViewModel(
                     item = null
                 )
                 sendFeedback()
+                _recommendationDownload.value = true
             }
         } else {
             if (currentItemIndex > 0) {

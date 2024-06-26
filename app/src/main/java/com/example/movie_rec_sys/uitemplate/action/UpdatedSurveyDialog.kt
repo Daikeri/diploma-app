@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -45,7 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.movie_rec_sys.viewmodel.CardDetailUiState
 import com.example.movie_rec_sys.viewmodel.DialogUiState
+import com.example.movie_rec_sys.viewmodel.RecScreenUiState
 import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 import com.example.movie_rec_sys.viewmodel.UpdatedDialogViewModel
 
@@ -56,16 +59,23 @@ fun UpdatedSurveyDialog(
     onRecDownload: () -> Unit
 ) {
     val uiState: DialogUiState by viewModel.uiState.observeAsState(DialogUiState.getEmptyInstance())
-    val recDownload: Boolean by viewModel.recommendationDownload.observeAsState(initial = false)
     val density = LocalDensity.current
+    val startDownload: Boolean by viewModel.recommendationDownload.observeAsState(false)
+    val downloadDone: RecScreenUiState by externalViewModel.generalUiState.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.getItems()
     }
 
-    LaunchedEffect(recDownload) {
-        if (recDownload)
+    LaunchedEffect(startDownload) {
+        if (startDownload)
+            externalViewModel.fetchRecommendation()
+    }
+
+    LaunchedEffect(downloadDone) {
+        downloadDone?.let {
             onRecDownload()
+        }
     }
 
     Dialog(
