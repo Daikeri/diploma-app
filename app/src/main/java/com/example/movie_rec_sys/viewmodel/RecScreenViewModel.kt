@@ -1,5 +1,6 @@
 package com.example.movie_rec_sys.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -39,15 +40,20 @@ class RecScreenViewModel(
         collectionRecommendation = viewModelScope.launch {
         firestoreRepos.recommendation
             .collect { rawHashes ->
-                if (!firstExtraction) {
-                    initializeUiState(rawHashes)
-                    firstExtraction = true
-                } else {
-                    rawHashes.forEach { newDoc ->
-                        if (newDoc["init_doc"] == null) {
-                            when(newDoc["action_flag"].toString()) {
-                                "ADDED", "REMOVED" -> updatesPool.add(newDoc)
-                                "MODIFIED" -> updateUiState(newDoc)
+                Log.e("RAW HASHES", "${rawHashes}")
+                if(rawHashes.isNotEmpty()) {
+                    if (!firstExtraction) {
+                        Log.e("FIRST INIT", "")
+                        initializeUiState(rawHashes)
+                        firstExtraction = true
+                    } else {
+                        rawHashes.forEach { newDoc ->
+                            Log.e("!NO FIRST INIT!", "")
+                            if (newDoc["init_doc"] == null) {
+                                when(newDoc["action_flag"].toString()) {
+                                    "ADDED", "REMOVED" -> updatesPool.add(newDoc)
+                                    "MODIFIED" -> updateUiState(newDoc)
+                                }
                             }
                         }
                     }

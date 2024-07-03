@@ -47,14 +47,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movie_rec_sys.R
 import com.example.movie_rec_sys.viewmodel.AuthViewModel
 import kotlinx.coroutines.delay
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun GenderScreen(
-    viewModel: AuthViewModel,
+    viewModel: AuthViewModel = viewModel(),
     toNextScreen: () -> Unit
 )  {
     Log.e("viewModel", "${viewModel.hashCode()}")
@@ -165,7 +165,7 @@ fun GenderScreen(
 // 120 а 85 для карточки возрастов
 @Composable
 fun AgeGroupScreen(
-    viewModel: AuthViewModel,
+    viewModel: AuthViewModel = viewModel(),
     toNextScreen: () -> Unit
 ) {
     Log.e("viewModel", "${viewModel.hashCode()}")

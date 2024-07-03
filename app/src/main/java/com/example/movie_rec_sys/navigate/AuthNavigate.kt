@@ -3,8 +3,10 @@ package com.example.movie_rec_sys.navigate
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
@@ -18,14 +20,17 @@ import com.example.movie_rec_sys.uitemplate.authorization.SignScreen
 import com.example.movie_rec_sys.viewmodel.AuthViewModel
 
 @Composable
-fun Navigate(app: MyApplication, viewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory )) {
+fun Navigate(
+    app: MyApplication,
+    navController: NavHostController = rememberNavController(),
+) {
 
     val startDestination = when(app.appContainer.fireBaseRepos.userExists()) {
         true -> "recommend-screen"
         false -> "general screen"
     }
 
-    val navController = rememberNavController()
+    Log.e("OWNER VM IN NAV GRAPH", "${LocalViewModelStoreOwner.current?.javaClass}\n${LocalViewModelStoreOwner.current.hashCode()}")
 
     NavHost(
         navController = navController,
@@ -33,28 +38,39 @@ fun Navigate(app: MyApplication, viewModel: AuthViewModel = viewModel(factory = 
     ) {
         composable("general screen") {
             GeneralScreen(
-                toIn = { navController.navigate("log in") },
-                toUp = { navController.navigate("sign up") }
+                toIn = { navController.navigate("log_in") },
+                toUp = { navController.navigate("sign_up") }
             )
         }
-        composable("log in") {
-            SignScreen(viewModel = viewModel, fillingAuthButton = "Log in") {
+        composable("log_in") {
+            SignScreen(fillingAuthButton = "Log in") {
                 navController.navigate("recommend-screen")
             }
         }
-        composable("sign up") {
-            SignScreen(viewModel = viewModel, fillingAuthButton = "Sign up") {
+        composable("sign_up") {
+            SignScreen(fillingAuthButton = "Sign up") {
                 navController.navigate("choose_gender")
             }
         }
         composable("choose_gender") {
+            val parentBackStackEntry = remember(it) {
+                navController.getBackStackEntry("sign_up")
+            }
 
-            GenderScreen(viewModel) {
+            val parentViewModel:AuthViewModel = viewModel(parentBackStackEntry)
+
+            GenderScreen(parentViewModel) {
                 navController.navigate("choose_age_group")
             }
         }
         composable("choose_age_group") {
-            AgeGroupScreen(viewModel) {
+            val parentBackStackEntry = remember(it) {
+                navController.getBackStackEntry("sign_up")
+            }
+
+            val parentViewModel:AuthViewModel = viewModel(parentBackStackEntry)
+
+            AgeGroupScreen(parentViewModel) {
                 navController.navigate("recommend-dialog")
             }
         }

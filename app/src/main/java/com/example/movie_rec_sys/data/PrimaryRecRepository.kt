@@ -16,7 +16,7 @@ class PrimaryRecRepository(
         return this.fetchesIDs
     }
 
-    suspend fun sendFeedback(map: MutableMap<String, MutableMap<String, Any?>>): Boolean {
+    suspend fun sendFeedback(map: GenresData): Boolean {
         return withContext(Dispatchers.IO) {
             dataSource.sendFeedback(map)
         }

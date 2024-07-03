@@ -10,6 +10,8 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.movie_rec_sys.MyApplication
+import com.example.movie_rec_sys.data.FirestoreRepository
+import com.example.movie_rec_sys.data.GenresData
 import com.example.movie_rec_sys.data.ItemRepository
 import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.data.PrimaryRecRepository
@@ -18,6 +20,7 @@ import kotlinx.coroutines.launch
 class UpdatedDialogViewModel(
     private val primaryRepos: PrimaryRecRepository,
     private val itemRepos: ItemRepository,
+    private val firestoreRepos: FirestoreRepository,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
@@ -78,7 +81,12 @@ class UpdatedDialogViewModel(
 
     private fun sendFeedback() {
         viewModelScope.launch {
-            primaryRepos.sendFeedback(sourceResponse)
+            val total = GenresData(
+                user_id = firestoreRepos.currentUser!!.uid,
+                genres = sourceResponse
+            )
+            Log.e("ОТПРАВКА ОБРАТНОЙ СВЯЗИ", "$total")
+            primaryRepos.sendFeedback(total)
         }
     }
 
@@ -97,6 +105,7 @@ class UpdatedDialogViewModel(
                 return UpdatedDialogViewModel(
                     (application as MyApplication).appContainer.primaryRecRepos,
                     (application as MyApplication).appContainer.itemRepos,
+                    (application as MyApplication).appContainer.fireStoreRepos,
                     savedStateHandle
                 ) as T
             }

@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 
 class FirestoreRepository(
     private val fireStore: FirebaseFirestore,
-    private var currentUser: FirebaseUser?
+    var currentUser: FirebaseUser?
 ) {
     suspend fun setNewUser(newVal: FirebaseUser?) {
         this.currentUser = newVal
@@ -38,7 +38,7 @@ class FirestoreRepository(
                         val hash = it.document.data
                         hash["doc_id"] = docID
                         hash["action_flag"] = it.type
-                        //Log.e("REPOSITORY", "${hash["relevance_index"]}")
+                        Log.e("REPOSITORY", "${hash["relevance_index"]}")
                         hash
                     }
                 )

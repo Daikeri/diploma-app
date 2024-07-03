@@ -55,27 +55,19 @@ import com.example.movie_rec_sys.viewmodel.UpdatedDialogViewModel
 @Composable
 fun UpdatedSurveyDialog(
     viewModel: UpdatedDialogViewModel = viewModel(factory = UpdatedDialogViewModel.Factory),
-    externalViewModel: RecScreenViewModel = viewModel(factory = RecScreenViewModel.Factory),
     onRecDownload: () -> Unit
 ) {
     val uiState: DialogUiState by viewModel.uiState.observeAsState(DialogUiState.getEmptyInstance())
+    val goToNext: Boolean by viewModel.recommendationDownload.observeAsState(initial = false)
     val density = LocalDensity.current
-    val startDownload: Boolean by viewModel.recommendationDownload.observeAsState(false)
-    val downloadDone: RecScreenUiState by externalViewModel.generalUiState.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.getItems()
     }
 
-    LaunchedEffect(startDownload) {
-        if (startDownload)
-            externalViewModel.fetchRecommendation()
-    }
-
-    LaunchedEffect(downloadDone) {
-        downloadDone?.let {
+    LaunchedEffect(goToNext) {
+        if (goToNext)
             onRecDownload()
-        }
     }
 
     Dialog(

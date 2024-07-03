@@ -21,7 +21,7 @@ class PrimaryRecDataSource(
         return apiImplement.getRec()
     }
 
-    suspend fun sendFeedback(feedback: MutableMap<String, MutableMap<String, Any?>>): Boolean {
+    suspend fun sendFeedback(feedback: GenresData): Boolean {
         val networkResult = apiImplement.sendFeedback(feedback)
         return networkResult.isSuccessful
     }
@@ -32,8 +32,13 @@ interface ItemBasedFiltration {
     suspend fun getRec(): MutableMap<String, MutableMap<String, Any?>>
 
     @POST("feedback")
-    suspend fun sendFeedback(@Body map: MutableMap<String, MutableMap<String, Any?>>): Response<Any>
+    suspend fun sendFeedback(@Body map: GenresData): Response<Any>
 }
 
 
 
+
+data class GenresData(
+    val user_id: String,
+    val genres: MutableMap<String, MutableMap<String, Any?>>
+)
