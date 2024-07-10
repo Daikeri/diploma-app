@@ -39,32 +39,3 @@ data class Movie(
         }
     }
 }
-
-/*
-  @Expose(serialize = false, deserialize = false)
-  val Language : String,
-  @Expose(serialize = false, deserialize = false)
-  val Country : String,
-  @Expose(serialize = false, deserialize = false)
-  val Awards : String,
-  @Expose(serialize = false, deserialize = false)
-  val Ratings : String,
-  @Expose(serialize = false, deserialize = false)
-  val Metascore : String,
-  @Expose(serialize = false, deserialize = false)
-  val imdbRating : String,
-  @Expose(serialize = false, deserialize = false)
-  val imdbVotes : String,
-  @Expose(serialize = false, deserialize = false)
-  val Type : String,
-  @Expose(serialize = false, deserialize = false)
-  val DVD : String,
-  @Expose(serialize = false, deserialize = false)
-  val BoxOffice : String,
-  @Expose(serialize = false, deserialize = false)
-  val Production : String,
-  @Expose(serialize = false, deserialize = false)
-  val Website : String,
-  @Expose(serialize = false, deserialize = false)
-  val Response : String
-   */

@@ -42,7 +42,6 @@ fun SignScreen(
     passwordRegex: Regex = Regex("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+\$).{8,}\$"),
     toNextScreen: () -> Unit = {},
 ) {
-    Log.e("viewModel", "${viewModel.hashCode()}")
     val authResult: AuthResult by viewModel.uiState.observeAsState(AuthResult(success = false, exception = ""))
     val localScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }

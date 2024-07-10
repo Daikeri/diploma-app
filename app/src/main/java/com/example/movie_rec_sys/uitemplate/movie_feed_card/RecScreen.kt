@@ -90,7 +90,6 @@ fun MyLazyColumns(generalUiState:RecScreenUiState, listState: LazyListState, toD
     LazyColumn(
         state = listState,
         modifier = Modifier
-
     ) {
         items(generalUiState.numFeeds) {
             MovieFeed(generalUiState.cardsContent[it], it, generalUiState.feedsTitle[it], toDetail)

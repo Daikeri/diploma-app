@@ -39,7 +39,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 //@Preview
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MovieFeed(
     cardStates: Map<String, Map<String, Any?>>, // cardStates: Map<String, Movie>

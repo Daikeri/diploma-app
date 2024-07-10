@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.system.measureTimeMillis
 
 class RecScreenViewModel(
     private val firestoreRepos: FirestoreRepository,
@@ -40,15 +41,12 @@ class RecScreenViewModel(
         collectionRecommendation = viewModelScope.launch {
         firestoreRepos.recommendation
             .collect { rawHashes ->
-                Log.e("RAW HASHES", "${rawHashes}")
                 if(rawHashes.isNotEmpty()) {
                     if (!firstExtraction) {
-                        Log.e("FIRST INIT", "")
                         initializeUiState(rawHashes)
                         firstExtraction = true
                     } else {
                         rawHashes.forEach { newDoc ->
-                            Log.e("!NO FIRST INIT!", "")
                             if (newDoc["init_doc"] == null) {
                                 when(newDoc["action_flag"].toString()) {
                                     "ADDED", "REMOVED" -> updatesPool.add(newDoc)
@@ -118,7 +116,7 @@ class RecScreenViewModel(
         return newState
     }
 
-    suspend fun appendTheUiState(rawHash: MutableMap<String, Any?>): RecScreenUiState {
+    private suspend fun appendTheUiState(rawHash: MutableMap<String, Any?>): RecScreenUiState {
         val newState = withContext(Dispatchers.Default) {
             val categorySet = _generalUiState.value.feedsTitle
             val targetCategoryName = categorySet.find { it == rawHash["category"].toString() }
@@ -154,16 +152,18 @@ class RecScreenViewModel(
 
 
     private suspend fun initializeUiState(rawHashes: List<MutableMap<String, Any?>>) {
-        val titles = extractTitleFeeds(rawHashes)
-        val cardStates = extractCardStates(rawHashes, titles)
-        val uiItems = fetchExternalContent(cardStates)
-        val newIndex = indexation(uiItems)
+        val time = measureTimeMillis {
+            val titles = extractTitleFeeds(rawHashes)
+            val cardStates = extractCardStates(rawHashes, titles)
+            val uiItems = fetchExternalContent(cardStates)
+            val newIndex = indexation(uiItems)
 
-        _generalUiState.value = RecScreenUiState(
-            numFeeds = newIndex.size,
-            feedsTitle = titles,
-            cardsContent = newIndex
-        )
+            _generalUiState.value = RecScreenUiState(
+                numFeeds = newIndex.size,
+                feedsTitle = titles,
+                cardsContent = newIndex
+            )
+        }
     }
 
     private suspend fun extractTitleFeeds(hashes: List<MutableMap<String, Any?>>): List<String> {

@@ -15,7 +15,9 @@ import com.example.movie_rec_sys.data.GenresData
 import com.example.movie_rec_sys.data.ItemRepository
 import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.data.PrimaryRecRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class UpdatedDialogViewModel(
     private val primaryRepos: PrimaryRecRepository,
@@ -34,6 +36,21 @@ class UpdatedDialogViewModel(
     private lateinit var movies: List<Movie>
     private var currentItemIndex = 0
 
+    private fun startDownload() {
+        viewModelScope.launch {
+            firestoreRepos.recommendation.collect { docUpdates ->
+                if (docUpdates.isNotEmpty()) {
+                    withContext(Dispatchers.IO) {
+                        docUpdates.forEach { doc ->
+                            itemRepos.getUserItem(doc["source_item_id"].toString())
+                        }
+                    }
+                    _recommendationDownload.value = true
+                }
+            }
+        }
+    }
+
     fun getItems() {
         viewModelScope.launch {
             sourceResponse = primaryRepos.fetchIDs()
@@ -41,7 +58,7 @@ class UpdatedDialogViewModel(
                 itemRepos.getUserItem(value["imdbId"].toString())
             }
             _uiState.value = DialogUiState(
-                loading = false,
+                isLoading = false,
                 item = movies[currentItemIndex]
             )
         }
@@ -52,22 +69,23 @@ class UpdatedDialogViewModel(
             if (currentItemIndex < movies.size - 1) {
                 currentItemIndex += 1
                 _uiState.value = DialogUiState(
-                    loading = false,
+                    isLoading = false,
                     item = movies[currentItemIndex]
                 )
             } else {
                 _uiState.value = DialogUiState(
-                    loading = true,
+                    isLoading = true,
                     item = null
                 )
                 sendFeedback()
-                _recommendationDownload.value = true
+                startDownload()
+
             }
         } else {
             if (currentItemIndex > 0) {
                 currentItemIndex -= 1
                 _uiState.value = DialogUiState(
-                    loading = false,
+                    isLoading = false,
                     item = movies[currentItemIndex]
                 )
             }
@@ -76,7 +94,6 @@ class UpdatedDialogViewModel(
 
     fun markItem(action: Boolean) {
         sourceResponse.values.toList()[currentItemIndex]["mark"] = action
-        Log.e("ITEM STATE AFTER MARK", "${sourceResponse.values}")
     }
 
     private fun sendFeedback() {
@@ -85,7 +102,6 @@ class UpdatedDialogViewModel(
                 user_id = firestoreRepos.currentUser!!.uid,
                 genres = sourceResponse
             )
-            Log.e("ОТПРАВКА ОБРАТНОЙ СВЯЗИ", "$total")
             primaryRepos.sendFeedback(total)
         }
     }
@@ -114,13 +130,13 @@ class UpdatedDialogViewModel(
 }
 
 data class DialogUiState(
-    val loading: Boolean,
+    val isLoading: Boolean,
     val item: Movie?=null
 ) {
     companion object {
         fun getEmptyInstance(): DialogUiState {
             return DialogUiState(
-                loading = true
+                isLoading = true
             )
         }
     }

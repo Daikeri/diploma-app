@@ -38,7 +38,6 @@ class FirestoreRepository(
                         val hash = it.document.data
                         hash["doc_id"] = docID
                         hash["action_flag"] = it.type
-                        Log.e("REPOSITORY", "${hash["relevance_index"]}")
                         hash
                     }
                 )

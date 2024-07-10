@@ -4,23 +4,17 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,27 +23,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.movie_rec_sys.viewmodel.CardDetailUiState
 import com.example.movie_rec_sys.viewmodel.DialogUiState
-import com.example.movie_rec_sys.viewmodel.RecScreenUiState
-import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 import com.example.movie_rec_sys.viewmodel.UpdatedDialogViewModel
 
 @Composable
@@ -58,15 +46,15 @@ fun UpdatedSurveyDialog(
     onRecDownload: () -> Unit
 ) {
     val uiState: DialogUiState by viewModel.uiState.observeAsState(DialogUiState.getEmptyInstance())
-    val goToNext: Boolean by viewModel.recommendationDownload.observeAsState(initial = false)
+    val downloadDone: Boolean by viewModel.recommendationDownload.observeAsState(initial = false)
     val density = LocalDensity.current
 
     LaunchedEffect(Unit) {
         viewModel.getItems()
     }
 
-    LaunchedEffect(goToNext) {
-        if (goToNext)
+    LaunchedEffect(downloadDone) {
+        if (downloadDone)
             onRecDownload()
     }
 
@@ -93,7 +81,7 @@ fun UpdatedSurveyDialog(
                     )
                 }
         ) {
-            if (!uiState.loading) {
+            if (!uiState.isLoading) {
                 Column(
                     modifier = Modifier
                         .padding(16.dp),
