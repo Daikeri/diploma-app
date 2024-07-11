@@ -24,7 +24,7 @@ class FirestoreRepository(
         this.currentUser = newVal
     }
 
-    val recommendation:Flow<List<MutableMap<String, Any?>>> = callbackFlow {
+    val recommendation:Flow<List<Triple<String, String, FirestoreDoc>>> = callbackFlow {
         val request = fireStore.collection("recommendation")
             .whereEqualTo("user_id", currentUser?.uid)
             .orderBy("relevance_index", Query.Direction.ASCENDING)
@@ -34,17 +34,24 @@ class FirestoreRepository(
                 }
                 trySend(
                     snapshot!!.documentChanges.map {
-                        val docID = it.document.id
                         val hash = it.document.data
-                        hash["doc_id"] = docID
-                        hash["action_flag"] = it.type
-                        Log.e("REPOSITORY", "${hash["relevance_index"]}")
-                        hash
+                        val actionFlag = it.type.toString()
+                        val docId = it.document.id
+                        val docContent = FirestoreDoc(
+                            category = hash["category"] as String,
+                            itemId = hash["source_item_id"] as String,
+                            marked = hash["marked"] as Boolean,
+                            viewed = hash["viewed"] as Boolean,
+                            rated = hash["rated"] as? Int,
+                            relevanceIndex = hash["relevance_index"] as Int,
+                        )
+                        Triple(actionFlag, docId, docContent)
                     }
                 )
             }
 
         awaitClose { request.remove() }
+
     }.flowOn(Dispatchers.IO)
 
 
@@ -84,22 +91,14 @@ class FirestoreRepository(
                 .await()
         }
     }
-
-    /*
-     fun fetchRecommendation(
-         collectionName: String="recommendation"
-     ):Flow<List<MutableMap<String, Any>>> = callbackFlow {
-         val request = fireStore.collection(collectionName)
-             .whereEqualTo("user_id", currentUser?.uid)
-             .addSnapshotListener { snapshot, fireStoreExcept ->
-                 if (fireStoreExcept != null) {
-                     Log.e("Firestore Exception in Flow", "${fireStoreExcept.message}")
-                     return@addSnapshotListener
-                 }
-                 trySend(snapshot!!.documentChanges.map { it.document.data })
-             }
-
-         awaitClose { request.remove() }
-    }.flowOn(Dispatchers.IO)
-     */
 }
+
+data class FirestoreDoc(
+    val category: String,
+    val itemId: String,
+    val marked: Boolean,
+    val viewed: Boolean,
+    val rated: Int?,
+    val relevanceIndex: Int,
+)
+

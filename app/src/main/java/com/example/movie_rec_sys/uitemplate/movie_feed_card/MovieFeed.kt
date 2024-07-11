@@ -1,6 +1,11 @@
 package com.example.movie_rec_sys.uitemplate.movie_feed_card
 
-import android.util.Log
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,45 +14,42 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Surface
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.movie_rec_sys.data.Movie
+import androidx.compose.ui.graphics.Color
+import com.example.movie_rec_sys.viewmodel.UIComponent
 
-import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-
-//@Preview
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MovieFeed(
-    cardStates: Map<String, Map<String, Any?>>, // cardStates: Map<String, Movie>
-    categoryIndex: Int,
-    categoryName: String="Some Category",
+    categoryName: String,
+    cardContent: Map<String, UIComponent>,
+    skeletonLoader: Boolean,
     toDetail: (Int, String) -> Unit,
-    viewModel: RecScreenViewModel = viewModel()
 ) {
+
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 0.7f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = 4000
+                0.1f at 0 using LinearEasing
+                0.7f at 2000 using LinearEasing
+                0.1f at 4000 using LinearEasing
+            },
+            repeatMode = RepeatMode.Restart
+        ), label = ""
+    )
 
     Box(
         modifier = Modifier
@@ -56,10 +58,7 @@ fun MovieFeed(
         Surface(
             elevation = 10.dp,
             color = MaterialTheme.colorScheme.surfaceContainerLowest,
-            //shape = RoundedCornerShape(28.dp),
             modifier = Modifier,
-            //.padding(bottom = 15.dp)
-
         ) {
             Column(
                 Modifier
@@ -73,7 +72,15 @@ fun MovieFeed(
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = categoryName)
+                    Text(
+                        text = if (skeletonLoader) "" else categoryName,
+                        modifier = Modifier.then(
+                            if (skeletonLoader)
+                                Modifier.background(Color.Gray.copy(alpha = alpha))
+                            else
+                                Modifier
+                        )
+                    )
                     Text(text = "All")
                 }
 
@@ -81,8 +88,13 @@ fun MovieFeed(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(15.dp),
                 ) {
-                    items(cardStates.keys.toList()) {docID ->
-                        MovieCard(categoryIndex, docID, cardStates[docID]!!, toDetail)
+                    items(cardContent.keys.toList()) {docID ->
+                        MovieCard(
+                            categoryName,
+                            docID,
+                            cardContent[docID]!!,
+                            toDetail
+                        )
                     }
                 }
             }

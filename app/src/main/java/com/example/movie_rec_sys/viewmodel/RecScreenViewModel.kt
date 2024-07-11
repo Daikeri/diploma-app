@@ -1,5 +1,6 @@
 package com.example.movie_rec_sys.viewmodel
 
+import android.app.assist.AssistStructure
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -9,6 +10,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.movie_rec_sys.MyApplication
+import com.example.movie_rec_sys.data.FirestoreDoc
 import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.data.FirestoreRepository
 import com.example.movie_rec_sys.data.ItemRepository
@@ -24,8 +26,8 @@ class RecScreenViewModel(
     private val itemRepos: ItemRepository,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
-    private val _generalUiState = MutableStateFlow<RecScreenUiState>(RecScreenUiState.getEmptyInstance())
-    val generalUiState: StateFlow<RecScreenUiState> = _generalUiState
+    private val _generalUiState = MutableStateFlow<MainScreenState>(MainScreenState.getEmptyInstance())
+    val generalUiState: StateFlow<MainScreenState> = _generalUiState
 
     private val _cardUiState = MutableLiveData<CardDetailUiState>()
     val cardUiState = _cardUiState
@@ -36,230 +38,62 @@ class RecScreenViewModel(
 
     private var updatesPool = mutableListOf<MutableMap<String, Any?>>()
 
-    fun fetchRecommendation() {
-        collectionRecommendation = viewModelScope.launch {
-        firestoreRepos.recommendation
-            .collect { rawHashes ->
-                Log.e("RAW HASHES", "${rawHashes}")
-                if(rawHashes.isNotEmpty()) {
-                    if (!firstExtraction) {
-                        Log.e("FIRST INIT", "")
-                        initializeUiState(rawHashes)
-                        firstExtraction = true
-                    } else {
-                        rawHashes.forEach { newDoc ->
-                            Log.e("!NO FIRST INIT!", "")
-                            if (newDoc["init_doc"] == null) {
-                                when(newDoc["action_flag"].toString()) {
-                                    "ADDED", "REMOVED" -> updatesPool.add(newDoc)
-                                    "MODIFIED" -> updateUiState(newDoc)
-                                }
-                            }
+    fun fetchRec() {
+        viewModelScope.launch {
+            firestoreRepos.recommendation.collect { docs ->
+                if (!firstExtraction) {
+                    initUI(docs)
+                    firstExtraction = true
+                } else {
+                    /*
+                    docs.forEach {
+                        val (actionFlag, docID, docData) = it
+                        when (actionFlag) {
+                            "ADDED", "REMOVED" -> updatesPool.add(newDoc)
+                            "MODIFIED" -> updateUiState(newDoc)
                         }
                     }
+
+                     */
                 }
             }
         }
     }
 
-    suspend fun applyUpdatesFromPool() {
-        lateinit var acc: RecScreenUiState
-        updatesPool.forEach { update ->
-            when(update["action_flag"].toString()) {
-                "REMOVED" -> {
-                    val result = removeFromUiState(update)
-                    _generalUiState.value = result
-                }
-                "ADDED" -> _generalUiState.value = appendTheUiState(update)
-            }
-        }
-        updatesPool.clear()
-    }
+    private fun initUI(states: List<Triple<String, String, FirestoreDoc>>) {
+        val recScreenContent = getEmptyContent(states)
 
-    private suspend fun updateUiState(rawHash: MutableMap<String, Any?>) {
-        val newState = withContext(Dispatchers.Default) {
-            val categorySet = _generalUiState.value.feedsTitle
-            val targetItemIndex = categorySet.indexOfFirst { it == rawHash["category"].toString() }
-            val updatedItem = _generalUiState.value.cardsContent[targetItemIndex][rawHash["doc_id"].toString()]
-            listOf("marked", "viewed", "rated").forEach {
-                updatedItem?.set(it, rawHash[it])
-            }
-            RecScreenUiState(
-                numFeeds = _generalUiState.value.numFeeds,
-                feedsTitle = _generalUiState.value.feedsTitle,
-                cardsContent = _generalUiState.value.cardsContent
-            )
-        }
-        _generalUiState.value = newState
-    }
-
-    private suspend fun removeFromUiState(rawHash: MutableMap<String, Any?>):RecScreenUiState {
-        val newState = withContext(Dispatchers.Default) {
-            val categorySet = _generalUiState.value.feedsTitle
-            val targetItemIndex = categorySet.indexOfFirst { it == rawHash["category"].toString() }
-            _generalUiState.value.cardsContent[targetItemIndex].remove(rawHash["doc_id"].toString())
-            val indexNonEmpty = _generalUiState.value.cardsContent
-                .mapIndexedNotNull  { index, linkedHashMap ->
-                    if (linkedHashMap.isNotEmpty()) index else null
-                }
-
-            val newState = indexNonEmpty.map {
-                (_generalUiState.value.feedsTitle[it] to _generalUiState.value.cardsContent[it])
-            }
-
-            val result = RecScreenUiState(
-                numFeeds = newState.size,
-                feedsTitle = newState.map { it.first },
-                cardsContent =  newState.map { it.second }
-            )
-
-            result
-        }
-        return newState
-    }
-
-    suspend fun appendTheUiState(rawHash: MutableMap<String, Any?>): RecScreenUiState {
-        val newState = withContext(Dispatchers.Default) {
-            val categorySet = _generalUiState.value.feedsTitle
-            val targetCategoryName = categorySet.find { it == rawHash["category"].toString() }
-            val (newFeeds, newCardsContent) = if (targetCategoryName == null) {
-                val newCategory = rawHash["category"].toString()
-                val updatedTitle = _generalUiState.value.feedsTitle + listOf(newCategory)
-                val docID = rawHash["doc_id"].toString()
-                rawHash.remove("doc_id")
-                val updatedCardsContent = _generalUiState.value.cardsContent + listOf(linkedMapOf(docID to rawHash))
-                (updatedTitle to updatedCardsContent)
-            } else {
-                val targetCategoryIndex = categorySet.indexOfFirst { it == rawHash["category"].toString() }
-                val docID = rawHash["doc_id"].toString()
-                _generalUiState.value.cardsContent[targetCategoryIndex][docID] =  mutableMapOf(
-                    "doc_id" to rawHash["doc_id"] as String,
-                    "item" to itemRepos.getUserItem(rawHash["source_item_id"] as String),
-                    "marked" to rawHash["marked"] as Boolean,
-                    "viewed" to rawHash["viewed"] as Boolean,
-                    "rated" to rawHash["rated"] as Int?
-                )
-
-                (_generalUiState.value.feedsTitle to _generalUiState.value.cardsContent)
-            }
-
-            RecScreenUiState(
-                numFeeds = newFeeds.size,
-                feedsTitle = newFeeds,
-                cardsContent = newCardsContent
-            )
-        }
-        return newState
-    }
-
-
-    private suspend fun initializeUiState(rawHashes: List<MutableMap<String, Any?>>) {
-        val titles = extractTitleFeeds(rawHashes)
-        val cardStates = extractCardStates(rawHashes, titles)
-        val uiItems = fetchExternalContent(cardStates)
-        val newIndex = indexation(uiItems)
-
-        _generalUiState.value = RecScreenUiState(
-            numFeeds = newIndex.size,
-            feedsTitle = titles,
-            cardsContent = newIndex
+        _generalUiState.value = MainScreenState(
+            skeletonTitle = true,
+            content = recScreenContent
         )
-    }
 
-    private suspend fun extractTitleFeeds(hashes: List<MutableMap<String, Any?>>): List<String> {
-       return withContext(Dispatchers.Default) {
-           val categories = linkedSetOf<String>()
-           hashes.forEach { hash ->
-               hash["category"]?.let { categories.add(it.toString()) }
-           }
-           categories.toList()
-       }
-    }
-
-    private suspend fun extractCardStates(
-        hashes: List<MutableMap<String, Any?>>,
-        categories: List<String>
-    ):List<List<MutableMap<String, Any?>>> {
-        return withContext(Dispatchers.Default) {
-            val cutHashes = mutableListOf<List<MutableMap<String, Any?>>>()
-
-            categories.forEach { category ->
-                val categoryElements = mutableListOf<MutableMap<String, Any?>>()
-
-                hashes.forEach { hash ->
-                    hash["category"]?.let {
-                        if (it == category)
-                            categoryElements.add(
-                                mutableMapOf(
-                                    "doc_id" to hash["doc_id"] as String,
-                                    "item" to hash["source_item_id"] as String,
-                                    "marked" to hash["marked"] as Boolean,
-                                    "viewed" to hash["viewed"] as Boolean,
-                                    "rated" to hash["rated"] as Int?
-                                )
-                            )
-                    }
-                }
-                cutHashes.add(categoryElements)
-            }
-
-            cutHashes
-        }
-    }
-
-    private suspend fun fetchExternalContent(
-        collection: List<List<MutableMap<String, Any?>>>
-    ):List<List<MutableMap<String, Any?>>> {
-        return withContext(Dispatchers.IO) {
-            collection.forEach { category ->
-                category.map { movie ->
-                    movie.replace("item", itemRepos.getUserItem(movie["item"] as String))
-                }
-            }
-            collection
-        }
-    }
-
-    private suspend fun indexation(
-        collection: List<List<MutableMap<String, Any?>>>
-    ): List<LinkedHashMap<String, MutableMap<String, Any?>>> {
-        return withContext(Dispatchers.Default) {
-            val result = collection.map { category ->
-                val acc = LinkedHashMap<String, MutableMap<String, Any?>>()
-                category.map { item ->
-                    val key = item["doc_id"] as String
-                    item.remove("doc_id")
-                    acc[key] = item.toMutableMap()
-                }
-                acc
-            }
-            result
-        }
-    }
-
-    fun uploadUpdates(
-        collectionName: String="shared_pool",
-        update: MutableMap<String, Any?>
-    ) {
         viewModelScope.launch {
-            firestoreRepos.uploadUpdates(collectionName, update)
+            states.forEach { (_, docId, docContent) ->
+                val movie = itemRepos.getUserItem(docContent.itemId)
+                recScreenContent[docContent.category]?.set(
+                    docId,
+                    UIComponent(
+                        item = movie,
+                        rated = docContent.rated,
+                        viewed = docContent.viewed,
+                        marked = docContent.marked
+                    )
+                )
+            }
         }
     }
 
-
-
-    fun onUserChooseItem(category: Int, itemKey: String) {
-        _cardUiState.value = _generalUiState.value.cardsContent[category][itemKey]?.let {
-            CardDetailUiState(
-                item = it["item"] as Movie,
-                marked = it["marked"] as Boolean,
-                viewed = it["viewed"] as Boolean,
-                rated = it["rated"] as Int?
-            )
+    private fun getEmptyContent(
+        states: List<Triple<String, String, FirestoreDoc>>
+    ): MutableMap<String, MutableMap<String, UIComponent>> {
+        val uiComposition: MutableMap<String, MutableMap<String, UIComponent>> = mutableMapOf()
+        states.forEach { (_, docId, docContent) ->
+            val category = uiComposition.getOrPut(docContent.category) { mutableMapOf() }
+            category[docId] = UIComponent()
         }
+        return uiComposition
     }
-
-
 
     companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
@@ -312,3 +146,31 @@ data class CardDetailUiState(
     }
 }
 
+data class UIComponent(
+    var item: Movie?=null,
+    val rated: Int?=null,
+    val viewed: Boolean = false,
+    val marked: Boolean = false,
+)
+
+data class MainScreenState(
+    val skeletonTitle: Boolean,
+    val content: Map<String, Map<String, UIComponent>>
+) {
+    companion object {
+        fun getEmptyInstance(): MainScreenState {
+            return MainScreenState(
+                skeletonTitle = true,
+                content = (1..3)
+                    .toList()
+                    .map { it.toString() }
+                    .associateWith {
+                        (1..10)
+                            .toList()
+                            .map { it.toString() }
+                            .associateWith { UIComponent() }
+                    }
+            )
+        }
+    }
+}
