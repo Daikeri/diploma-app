@@ -1,7 +1,9 @@
 package com.example.movie_rec_sys.uitemplate.movie_feed_card
 
 import android.util.Log
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -76,30 +79,31 @@ fun MovieCard(isDownload: Boolean, state: UIComponent) {
 
     val infiniteTransition = rememberInfiniteTransition(label = "")
 
-    val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 0.7f,
+    val alpha by infiniteTransition.animateColor(
+        initialValue = Color(0xFFCAC5CB),
+        targetValue = Color(0xFF413F44),
         animationSpec = infiniteRepeatable(
             animation = keyframes {
-                durationMillis = 4000
-                0.3f at 0 using LinearEasing
-                0.7f at 2000 using LinearEasing
-                0.3f at 4000 using LinearEasing
+                durationMillis = state.delay + 2500
+                Color(0xFFCAC5CB) at state.delay using LinearOutSlowInEasing
+                Color(0xFF413F44) at state.delay + 1000 using LinearOutSlowInEasing
+                Color(0xFFCAC5CB) at state.delay + 2500 using LinearEasing
             },
             repeatMode = RepeatMode.Restart
         ), label = ""
     )
 
-    OutlinedCard(
+
+    Card(
         onClick = {
             //viewModel.onUserChooseItem(categoryName, docID)
             //toDetail(categoryName, docID)
         },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor =  MaterialTheme.colorScheme.primary.copy(alpha=0f)
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
+            //defaultElevation = 4.dp
         ),
         modifier = Modifier
             .padding(horizontal = 6.dp)
@@ -109,7 +113,6 @@ fun MovieCard(isDownload: Boolean, state: UIComponent) {
             Modifier.fillMaxSize(),
         ) {
             if (isDownload) {
-                Log.e("IN DONE", "")
                 DownloadImage(
                     modifier = Modifier.weight(3f),
                     state = state
@@ -118,7 +121,7 @@ fun MovieCard(isDownload: Boolean, state: UIComponent) {
                 ImageStub(
                     modifier = Modifier
                         .weight(3f)
-                        .background(Color.LightGray.copy(alpha = alpha))
+                        .background(alpha)
                 )
             }
             Column(
@@ -131,14 +134,15 @@ fun MovieCard(isDownload: Boolean, state: UIComponent) {
                     text = if (isDownload) state.item!!.title else "",
                     textAlign = TextAlign.Start,
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color(0xFF615C69),//MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
                         .fillMaxWidth()
                         .then(
                             if (isDownload)
                                 Modifier
                             else
-                                Modifier.background(Color.LightGray.copy(alpha = alpha))
+                                Modifier.background(alpha)
                         )
                 )
             }

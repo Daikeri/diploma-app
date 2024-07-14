@@ -3,6 +3,7 @@ package com.example.movie_rec_sys.uitemplate.movie_feed_card
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -23,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movie_rec_sys.viewmodel.MainScreenState
 import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
@@ -79,10 +81,10 @@ fun RecScreen(
 
 @Composable
 fun MyLazyColumns(generalUiState: MainScreenState, listState: LazyListState, toDetail: (Int, String) -> Unit) {
-    Log.e("UPDATE UI IN COLUMN", "")
     LazyColumn(
+        contentPadding = PaddingValues(vertical = 8.dp),
         state = listState,
-        modifier = Modifier
+        modifier = Modifier,
     ) {
         items(generalUiState.content.keys.toList()) {
             MovieFeed(

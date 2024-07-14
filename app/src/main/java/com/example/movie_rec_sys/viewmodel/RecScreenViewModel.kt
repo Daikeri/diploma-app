@@ -14,6 +14,7 @@ import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.data.FirestoreRepository
 import com.example.movie_rec_sys.data.ItemRepository
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -50,7 +51,6 @@ class RecScreenViewModel(
                             "MODIFIED" -> updateUiState(newDoc)
                         }
                     }
-
                      */
                 }
             }
@@ -73,49 +73,67 @@ class RecScreenViewModel(
     }
 
     private fun initUI(states: List<Triple<String, String, FirestoreDoc>>) {
-        val recScreenContent = getEmptyContent(states)
+        val recScreenContent = getUIStructure(states)
+        var commonDelay = 0
+        val emptyUI = recScreenContent.keys
+            .zip(
+                recScreenContent.values
+                    .toList()
+                    .map { category ->
+                        category
+                            .mapValues { _ ->
+                                val result = UIComponent(delay = commonDelay)
+                                Log.e("DELAY = $commonDelay", "")
+                                commonDelay += 250
+                                result
+                            }
+                            .toMutableMap()
+                    }
+            )
+            .toMap()
 
-        _generalUiState.value = MainScreenState(
-            skeletonTitle = true,
-            content = recScreenContent
-        )
+        _generalUiState.value = _generalUiState.value.copy(content = emptyUI)
+
 
         viewModelScope.launch {
-            val stack = mutableListOf(recScreenContent)
-            states.forEach { (_, docId, docContent) ->
-                val newHash = deepCopy(stack.removeLast())
-                val movie = itemRepos.getUserItem(docId, docContent.itemId)
-                val newComponent = UIComponent(
-                    item = movie,
-                    rated = docContent.rated,
-                    viewed = docContent.viewed,
-                    marked = docContent.marked
-                )
 
-                newHash[docContent.category]?.set(
-                    docId,
-                    newComponent
-                )
+            val stack = mutableListOf(emptyUI)
+            recScreenContent.keys.forEach { category ->
+                recScreenContent[category]!!.forEach {
+                    val newHash = deepCopy(stack.removeLast())
+                    val movie = itemRepos.getUserItem(it.key, it.value.itemId)
+                    val newComponent = UIComponent(
+                        item = movie,
+                        rated = it.value.rated,
+                        viewed = it.value.viewed,
+                        marked = it.value.marked,
+                    )
 
-                val newState = MainScreenState(
-                    skeletonTitle = false,
-                    content = newHash
-                )
+                    newHash[category]?.set(
+                        it.key,
+                        newComponent
+                    )
 
-                stack.add(newHash as MutableMap<String, MutableMap<String, UIComponent>>)
+                    val newState = MainScreenState(
+                        skeletonTitle = false,
+                        content = newHash
+                    )
 
-                _generalUiState.value = newState
+                    delay(5000)
+                    stack.add(newHash)
+                    _generalUiState.value = newState
+                }
             }
         }
     }
 
-    private fun getEmptyContent(
+    private fun getUIStructure(
         states: List<Triple<String, String, FirestoreDoc>>
-    ): MutableMap<String, MutableMap<String, UIComponent>> {
-        val uiComposition: MutableMap<String, MutableMap<String, UIComponent>> = mutableMapOf()
+    ): MutableMap<String, MutableMap<String, FirestoreDoc>> {
+        val uiComposition: MutableMap<String, MutableMap<String, FirestoreDoc>> = mutableMapOf()
         states.forEach { (_, docId, docContent) ->
             val category = uiComposition.getOrPut(docContent.category) { mutableMapOf() }
-            category[docId] = UIComponent()
+            category[docId] = docContent
         }
         return uiComposition
     }
@@ -159,6 +177,7 @@ data class UIComponent(
     val rated: Int?=null,
     val viewed: Boolean = false,
     val marked: Boolean = false,
+    val delay: Int = 0
 )
 
 data class MainScreenState(
@@ -166,19 +185,32 @@ data class MainScreenState(
     val content: Map<String, Map<String, UIComponent>>
 ) {
     companion object {
+        private var instance: MainScreenState? = null
         fun getEmptyInstance(): MainScreenState {
-            return MainScreenState(
-                skeletonTitle = true,
-                content = (1..3)
-                    .toList()
-                    .map { it.toString() }
-                    .associateWith {
-                        (1..10)
-                            .toList()
-                            .map { it.toString() }
-                            .associateWith { UIComponent() }
-                    }
-            )
+
+            if (this.instance != null) {
+                return this.instance!!
+            } else {
+                var commonDelay = 0
+                this.instance = MainScreenState(
+                    skeletonTitle = true,
+                    content = (1..3)
+                        .toList()
+                        .map { it.toString() }
+                        .associateWith {
+                            (1..10)
+                                .toList()
+                                .map { it.toString() }
+                                .associateWith {
+                                    val result = UIComponent()
+                                    commonDelay += 250
+                                    result
+                                }
+                        }
+                )
+                return this.instance!!
+            }
+
         }
     }
 }
