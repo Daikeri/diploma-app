@@ -119,7 +119,7 @@ class RecScreenViewModel(
                         content = newHash
                     )
 
-                    delay(5000)
+                    delay(60000)
                     stack.add(newHash)
                     _generalUiState.value = newState
                 }

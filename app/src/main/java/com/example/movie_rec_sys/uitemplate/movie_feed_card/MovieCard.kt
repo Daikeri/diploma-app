@@ -26,6 +26,8 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -53,12 +55,28 @@ fun MovieCard(
 }
 
 @Composable
-fun ImageStub(modifier: Modifier) {
-   Box(modifier = Modifier
-       .fillMaxSize()
-       .clip(RoundedCornerShape(12.dp))
-       .then(modifier)
-   )
+fun ImageStub(state: UIComponent, modifier: Modifier) {
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+    key(state) {
+        val dynamicColor = infiniteTransition.animateColor(
+            initialValue = Color(0xFFCAC5CB),
+            targetValue = Color(0xFF413F44),
+            animationSpec = infiniteRepeatable(
+                animation = keyframes {
+                    durationMillis = state.delay + 2500
+                    Color(0xFFCAC5CB) at state.delay using LinearOutSlowInEasing
+                    Color(0xFF413F44) at state.delay + 1000 using LinearOutSlowInEasing
+                    Color(0xFFCAC5CB) at state.delay + 2500 using LinearEasing
+                },
+                repeatMode = RepeatMode.Restart
+            ), label = "")
+
+        Box(modifier = Modifier
+            .background(dynamicColor.value)
+            .fillMaxSize()
+            .clip(RoundedCornerShape(12.dp))
+        )
+    }
 }
 
 @Composable
@@ -76,24 +94,6 @@ fun DownloadImage(modifier: Modifier, state:UIComponent) {
 
 @Composable
 fun MovieCard(isDownload: Boolean, state: UIComponent) {
-
-    val infiniteTransition = rememberInfiniteTransition(label = "")
-
-    val alpha by infiniteTransition.animateColor(
-        initialValue = Color(0xFFCAC5CB),
-        targetValue = Color(0xFF413F44),
-        animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = state.delay + 2500
-                Color(0xFFCAC5CB) at state.delay using LinearOutSlowInEasing
-                Color(0xFF413F44) at state.delay + 1000 using LinearOutSlowInEasing
-                Color(0xFFCAC5CB) at state.delay + 2500 using LinearEasing
-            },
-            repeatMode = RepeatMode.Restart
-        ), label = ""
-    )
-
-
     Card(
         onClick = {
             //viewModel.onUserChooseItem(categoryName, docID)
@@ -119,9 +119,9 @@ fun MovieCard(isDownload: Boolean, state: UIComponent) {
                 )
             } else {
                 ImageStub(
+                    state,
                     modifier = Modifier
                         .weight(3f)
-                        .background(alpha)
                 )
             }
             Column(
@@ -142,7 +142,8 @@ fun MovieCard(isDownload: Boolean, state: UIComponent) {
                             if (isDownload)
                                 Modifier
                             else
-                                Modifier.background(alpha)
+                                Modifier
+                            // Modifier.background(dynamicColor)
                         )
                 )
             }

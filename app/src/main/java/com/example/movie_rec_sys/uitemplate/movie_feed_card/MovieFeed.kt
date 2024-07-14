@@ -103,6 +103,9 @@ fun MovieFeed(
 
 @Composable
 fun UpdatedContent(cardContent: Map<String, UIComponent>, categoryName: String, toDetail: (Int, String) -> Unit) {
+    cardContent.values.forEach {
+        Log.e("item=${it.item}|delay=${it.delay}", "")
+    }
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(15.dp),
