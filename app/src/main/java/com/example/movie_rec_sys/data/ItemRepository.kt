@@ -6,25 +6,20 @@ import kotlinx.coroutines.withContext
 class ItemRepository(
     private val dataSource: ItemRemoteDataSource
 ) {
-    private var userItems: MutableList<Movie> = mutableListOf()
+    private var userItems: MutableMap<String, Movie> = mutableMapOf()
 
-    suspend fun getUserItems(ids: List<String>): List<Movie> {
+    suspend fun getUserItem(docID: String, itemID: String): Movie {
         val networkResult = withContext(Dispatchers.IO) {
-            val finalList = mutableListOf<Movie>()
-            ids.forEach {
-                finalList.add(dataSource.fetchItem(it))
-            }
-            finalList
+            dataSource.fetchItem(itemID)
         }
-        this.userItems = networkResult
-        return this.userItems
+        userItems[docID] = networkResult
+        return networkResult
     }
 
-    suspend fun getUserItem(id: String): Movie {
+    suspend fun withoutCash(itemID: String): Movie {
         val networkResult = withContext(Dispatchers.IO) {
-            dataSource.fetchItem(id)
+            dataSource.fetchItem(itemID)
         }
-        this.userItems.add(networkResult)
         return networkResult
     }
 }

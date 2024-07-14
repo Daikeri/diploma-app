@@ -43,7 +43,7 @@ class FirestoreRepository(
                             marked = hash["marked"] as Boolean,
                             viewed = hash["viewed"] as Boolean,
                             rated = hash["rated"] as? Int,
-                            relevanceIndex = hash["relevance_index"] as Int,
+                            relevanceIndex = (hash["relevance_index"] as Long).toInt(),
                         )
                         Triple(actionFlag, docId, docContent)
                     }

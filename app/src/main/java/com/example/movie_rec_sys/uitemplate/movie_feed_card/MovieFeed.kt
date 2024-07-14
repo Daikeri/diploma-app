@@ -1,5 +1,6 @@
 package com.example.movie_rec_sys.uitemplate.movie_feed_card
 
+import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -34,7 +35,6 @@ fun MovieFeed(
     skeletonLoader: Boolean,
     toDetail: (Int, String) -> Unit,
 ) {
-
     val infiniteTransition = rememberInfiniteTransition(label = "")
 
     val alpha by infiniteTransition.animateFloat(
@@ -76,7 +76,7 @@ fun MovieFeed(
                         text = if (skeletonLoader) "" else categoryName,
                         modifier = Modifier.then(
                             if (skeletonLoader)
-                                Modifier.background(Color.Gray.copy(alpha = alpha))
+                                Modifier.background(Color.Red.copy(alpha = alpha))
                             else
                                 Modifier
                         )
@@ -84,7 +84,36 @@ fun MovieFeed(
                     Text(text = "All")
                 }
 
-                LazyRow(
+                UpdatedContent(
+                    cardContent = cardContent,
+                    categoryName = categoryName,
+                    toDetail = toDetail
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun UpdatedContent(cardContent: Map<String, UIComponent>, categoryName: String, toDetail: (Int, String) -> Unit) {
+    Log.e("CONTENT FOR CARD", "")
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(15.dp),
+    ) {
+        items(cardContent.keys.toList()) {docID ->
+            MovieCard(
+                categoryName,
+                docID,
+                cardContent[docID]!!,
+                toDetail
+            )
+        }
+    }
+}
+
+/*
+ LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(15.dp),
                 ) {
@@ -97,8 +126,4 @@ fun MovieFeed(
                         )
                     }
                 }
-            }
-        }
-    }
-
-}
+ */

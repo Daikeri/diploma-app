@@ -1,5 +1,6 @@
 package com.example.movie_rec_sys.uitemplate.movie_feed_card
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,6 +35,7 @@ fun RecScreen(
     toDetail: (Int, String) -> Unit
 ) {
     val generalUiState by viewModel.generalUiState.collectAsState()
+
     var needRepeat by rememberSaveable { mutableStateOf(false) }
 
     var isRefreshing by remember { mutableStateOf(false) }
@@ -47,7 +49,7 @@ fun RecScreen(
             if (listState.firstVisibleItemScrollOffset == 0) {
                 scope.launch {
                     isRefreshing = true
-                    viewModel.applyUpdatesFromPool()
+                    //viewModel.applyUpdatesFromPool()
                     isRefreshing = false
                 }
             }
@@ -55,7 +57,7 @@ fun RecScreen(
 
     LaunchedEffect(Unit) {
         if (!needRepeat) {
-            viewModel.fetchRecommendation()
+            viewModel.fetchRec()
             needRepeat = true
         }
     }
@@ -77,6 +79,7 @@ fun RecScreen(
 
 @Composable
 fun MyLazyColumns(generalUiState: MainScreenState, listState: LazyListState, toDetail: (Int, String) -> Unit) {
+    Log.e("UPDATE UI IN COLUMN", "")
     LazyColumn(
         state = listState,
         modifier = Modifier

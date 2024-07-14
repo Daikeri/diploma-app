@@ -48,7 +48,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movie_rec_sys.viewmodel.CardDetailUiState
 import com.example.movie_rec_sys.viewmodel.DialogUiState
-import com.example.movie_rec_sys.viewmodel.RecScreenUiState
 import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 import com.example.movie_rec_sys.viewmodel.UpdatedDialogViewModel
 

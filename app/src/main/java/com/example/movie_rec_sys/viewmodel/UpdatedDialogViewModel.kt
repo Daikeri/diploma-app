@@ -38,7 +38,7 @@ class UpdatedDialogViewModel(
         viewModelScope.launch {
             sourceResponse = primaryRepos.fetchIDs()
             movies = sourceResponse.map { (_, value) ->
-                itemRepos.getUserItem(value["imdbId"].toString())
+                itemRepos.withoutCash(value["imdbId"].toString())
             }
             _uiState.value = DialogUiState(
                 loading = false,

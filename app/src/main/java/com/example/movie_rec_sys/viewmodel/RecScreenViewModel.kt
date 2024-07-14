@@ -1,6 +1,5 @@
 package com.example.movie_rec_sys.viewmodel
 
-import android.app.assist.AssistStructure
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -14,12 +13,10 @@ import com.example.movie_rec_sys.data.FirestoreDoc
 import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.data.FirestoreRepository
 import com.example.movie_rec_sys.data.ItemRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class RecScreenViewModel(
     private val firestoreRepos: FirestoreRepository,
@@ -60,6 +57,21 @@ class RecScreenViewModel(
         }
     }
 
+    private fun <K, V> deepCopy(map: Map<K, V>): Map<K, V> {
+        return map.mapValues { entry ->
+            when (entry.value) {
+                is Map<*, *> -> deepCopy(entry.value as Map<Any?, Any?>) as V
+                is List<*> -> (entry.value as List<*>).map {
+                    when (it) {
+                        is Map<*, *> -> deepCopy(it as Map<Any?, Any?>)
+                        else -> it
+                    }
+                } as V
+                else -> entry.value
+            }
+        }
+    }
+
     private fun initUI(states: List<Triple<String, String, FirestoreDoc>>) {
         val recScreenContent = getEmptyContent(states)
 
@@ -69,17 +81,30 @@ class RecScreenViewModel(
         )
 
         viewModelScope.launch {
+            val stack = mutableListOf(recScreenContent)
             states.forEach { (_, docId, docContent) ->
-                val movie = itemRepos.getUserItem(docContent.itemId)
-                recScreenContent[docContent.category]?.set(
-                    docId,
-                    UIComponent(
-                        item = movie,
-                        rated = docContent.rated,
-                        viewed = docContent.viewed,
-                        marked = docContent.marked
-                    )
+                val newHash = deepCopy(stack.removeLast())
+                val movie = itemRepos.getUserItem(docId, docContent.itemId)
+                val newComponent = UIComponent(
+                    item = movie,
+                    rated = docContent.rated,
+                    viewed = docContent.viewed,
+                    marked = docContent.marked
                 )
+
+                newHash[docContent.category]?.set(
+                    docId,
+                    newComponent
+                )
+
+                val newState = MainScreenState(
+                    skeletonTitle = false,
+                    content = newHash
+                )
+
+                stack.add(newHash as MutableMap<String, MutableMap<String, UIComponent>>)
+
+                _generalUiState.value = newState
             }
         }
     }
@@ -115,23 +140,6 @@ class RecScreenViewModel(
         }
     }
 }
-
-data class RecScreenUiState(
-    val numFeeds: Int,
-    val feedsTitle: List<String>,
-    val cardsContent:  List<LinkedHashMap<String, MutableMap<String, Any?>>>,
-) {
-    companion object {
-        fun getEmptyInstance(): RecScreenUiState {
-            return RecScreenUiState(
-                numFeeds = 0,
-                feedsTitle = emptyList(),
-                cardsContent = emptyList(),
-            )
-        }
-    }
-}
-
 
 data class CardDetailUiState(
     var item: Movie = Movie.emptyInstance(),

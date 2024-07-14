@@ -1,5 +1,6 @@
 package com.example.movie_rec_sys.uitemplate.movie_feed_card
 
+import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -7,7 +8,9 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,8 +23,11 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,6 +45,35 @@ fun MovieCard(
     toDetail: (Int, String) -> Unit,
     viewModel: RecScreenViewModel = viewModel()
 ) {
+    val isDownload = state.item!=null
+    MovieCard(isDownload, state)
+}
+
+@Composable
+fun ImageStub(modifier: Modifier) {
+   Box(modifier = Modifier
+       .fillMaxSize()
+       .clip(RoundedCornerShape(12.dp))
+       .then(modifier)
+   )
+}
+
+@Composable
+fun DownloadImage(modifier: Modifier, state:UIComponent) {
+    Image(
+        bitmap = state.item!!.downloadImage!!,
+        contentDescription = null,
+        contentScale = ContentScale.FillBounds,
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(12.dp))
+            .then(modifier)
+    )
+}
+
+@Composable
+fun MovieCard(isDownload: Boolean, state: UIComponent) {
+
     val infiniteTransition = rememberInfiniteTransition(label = "")
 
     val alpha by infiniteTransition.animateFloat(
@@ -47,9 +82,9 @@ fun MovieCard(
         animationSpec = infiniteRepeatable(
             animation = keyframes {
                 durationMillis = 4000
-                0.1f at 0 using LinearEasing
+                0.3f at 0 using LinearEasing
                 0.7f at 2000 using LinearEasing
-                0.1f at 4000 using LinearEasing
+                0.3f at 4000 using LinearEasing
             },
             repeatMode = RepeatMode.Restart
         ), label = ""
@@ -73,16 +108,17 @@ fun MovieCard(
         Column(
             Modifier.fillMaxSize(),
         ) {
-            state.item!!.downloadImage?.let {
-                Image(
-                    bitmap = it,
-                    contentDescription = null,
-                    contentScale = ContentScale.FillBounds,
+            if (isDownload) {
+                Log.e("IN DONE", "")
+                DownloadImage(
+                    modifier = Modifier.weight(3f),
+                    state = state
+                )
+            } else {
+                ImageStub(
                     modifier = Modifier
                         .weight(3f)
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(12.dp))
-
+                        .background(Color.LightGray.copy(alpha = alpha))
                 )
             }
             Column(
@@ -92,12 +128,18 @@ fun MovieCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = state.item!!.title,
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    text = if (isDownload) state.item!!.title else "",
                     textAlign = TextAlign.Start,
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .then(
+                            if (isDownload)
+                                Modifier
+                            else
+                                Modifier.background(Color.LightGray.copy(alpha = alpha))
+                        )
                 )
             }
         }
