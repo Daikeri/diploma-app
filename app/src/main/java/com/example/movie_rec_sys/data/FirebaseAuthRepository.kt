@@ -1,5 +1,6 @@
 package com.example.movie_rec_sys.data
 
+import android.util.Log
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException

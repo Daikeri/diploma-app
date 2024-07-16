@@ -6,13 +6,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,28 +26,37 @@ import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 
 @Composable // 40 symbol max
 fun MovieCard(
-    item: Movie,
-    toDetail: (String) -> Unit = {},
-    viewModel: RecScreenViewModel = viewModel(factory = RecScreenViewModel.Factory)
+    categoryIndex: Int,
+    docID: String,
+    hash: Map<String, Any?>,
+    toDetail: (Int, String) -> Unit,
+    viewModel: RecScreenViewModel = viewModel()
 ) {
     OutlinedCard(
         onClick = {
-            toDetail(item.externalId)
+            viewModel.onUserChooseItem(categoryIndex, docID)
+            toDetail(categoryIndex, docID)
         },
-        modifier = Modifier.size(width = 120.dp, height = 240.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            containerColor = MaterialTheme.colorScheme.primary,
         ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 6.dp)
+            .size(width = 120.dp, height = 240.dp)
     ) {
         Column(
             Modifier.fillMaxSize(),
         ) {
-            item.posterImage?.let {
+            (hash["item"] as Movie).downloadImage?.let {
                 Image(
                     bitmap = it,
                     contentDescription = null,
-                    Modifier.weight(3f)
+                    Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .weight(3f)
                         .fillMaxSize()
                 )
             }
@@ -54,12 +67,12 @@ fun MovieCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = item.title,
+                    text = (hash["item"] as Movie).title,
                     modifier = Modifier
                         .fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }

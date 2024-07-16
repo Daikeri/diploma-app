@@ -8,7 +8,10 @@ import com.example.movie_rec_sys.data.ItemRepository
 import com.example.movie_rec_sys.data.PrimaryRecDataSource
 import com.example.movie_rec_sys.data.PrimaryRecRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.firestoreSettings
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.persistentCacheSettings
 import com.google.firebase.ktx.Firebase
 
 class AppContainer(myApplication: MyApplication) {
@@ -20,7 +23,7 @@ class AppContainer(myApplication: MyApplication) {
     val primaryRecRepos = PrimaryRecRepository(dockerDS)
 
     private val itemSource = "http://www.omdbapi.com"
-    private val apiKey =  "f75f8380"//"67bd6ed"
+    private val apiKey =  "67bd6ed"//"67bd6ed" f75f8380
     private val itemDS = ItemRemoteDataSource(itemSource, apiKey, myApplication)
     val itemRepos = ItemRepository(itemDS)
 
@@ -29,5 +32,9 @@ class AppContainer(myApplication: MyApplication) {
 
     init {
         fireBaseRepos.addCallback { fireStoreRepos.setNewUser(it) }
+        fireStore.firestoreSettings = firestoreSettings {
+            isPersistenceEnabled = false
+        }
+
     }
 }

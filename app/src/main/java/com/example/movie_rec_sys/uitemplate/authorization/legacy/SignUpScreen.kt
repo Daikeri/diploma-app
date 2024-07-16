@@ -81,7 +81,7 @@ fun SignUpScreen(
                         toRecScreen()
                     }
                     else {
-                        Log.e("SIGN UP", "$authResult.success.toString() ${authResult.exception}")
+                        //Log.e("SIGN UP", "$authResult.success.toString() ${authResult.exception}")
                         snackbarHostState.showSnackbar(message = authResult.exception)
                     }
                 }

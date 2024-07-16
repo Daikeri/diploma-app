@@ -1,8 +1,6 @@
 package com.example.movie_rec_sys.data
 import com.google.gson.annotations.SerializedName
-import java.util.concurrent.atomic.AtomicInteger
 import androidx.compose.ui.graphics.ImageBitmap
-import java.util.UUID
 
 
 data class Movie(
@@ -19,7 +17,7 @@ data class Movie(
     @SerializedName("Poster") var poster: String,
     @SerializedName("Country") var country: String,
     @SerializedName("imdbRating") var imdbRating: String,
-    var posterImage: ImageBitmap? = null
+    var downloadImage: ImageBitmap? = null,
 ) {
     companion object {
         fun emptyInstance(): Movie {
@@ -36,38 +34,8 @@ data class Movie(
                 plot = "",
                 poster = "",
                 country = "",
-                imdbRating = "",
-                posterImage = null
+                imdbRating = ""
             )
         }
     }
 }
-
-/*
-  @Expose(serialize = false, deserialize = false)
-  val Language : String,
-  @Expose(serialize = false, deserialize = false)
-  val Country : String,
-  @Expose(serialize = false, deserialize = false)
-  val Awards : String,
-  @Expose(serialize = false, deserialize = false)
-  val Ratings : String,
-  @Expose(serialize = false, deserialize = false)
-  val Metascore : String,
-  @Expose(serialize = false, deserialize = false)
-  val imdbRating : String,
-  @Expose(serialize = false, deserialize = false)
-  val imdbVotes : String,
-  @Expose(serialize = false, deserialize = false)
-  val Type : String,
-  @Expose(serialize = false, deserialize = false)
-  val DVD : String,
-  @Expose(serialize = false, deserialize = false)
-  val BoxOffice : String,
-  @Expose(serialize = false, deserialize = false)
-  val Production : String,
-  @Expose(serialize = false, deserialize = false)
-  val Website : String,
-  @Expose(serialize = false, deserialize = false)
-  val Response : String
-   */
