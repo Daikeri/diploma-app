@@ -38,7 +38,7 @@ data class Movie(
             )
         }
     }
-
+    
     override fun toString(): String {
         return this.externalId
     }

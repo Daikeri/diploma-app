@@ -1,6 +1,5 @@
 package com.example.movie_rec_sys.uitemplate.movie_feed_card
 
-
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -70,7 +69,6 @@ fun CardDetail(
         val items =  mutableListOf(
             "Imdb Rating:${cardUiState.item.imdbRating}",
             "Rated:${cardUiState.item.rated}",
-            cardUiState.item.country.split(", ")[0]
         ).plus(cardUiState.item.genre.split(", "))
         value = items.shuffled()
     }

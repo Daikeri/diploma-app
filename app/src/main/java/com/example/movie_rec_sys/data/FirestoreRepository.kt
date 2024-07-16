@@ -42,9 +42,7 @@ class FirestoreRepository(
                     )
                     Triple(actionFlag, docId, docContent)
                 }
-                trySend(
-                    result
-                )
+                trySend(result)
             }
 
         awaitClose { request.remove() }

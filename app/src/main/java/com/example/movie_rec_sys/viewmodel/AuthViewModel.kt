@@ -34,7 +34,6 @@ class AuthViewModel(
     }
 
     fun addMetaData(key: String, value: Any?) {
-        Log.e("METADATA", "${metaData}")
         metaData[key] = value
     }
 
