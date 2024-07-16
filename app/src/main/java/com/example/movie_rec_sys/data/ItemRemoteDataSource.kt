@@ -8,6 +8,7 @@ import coil.request.ImageRequest
 import coil.request.ImageResult
 import coil.request.SuccessResult
 import com.example.movie_rec_sys.MyApplication
+import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -18,10 +19,14 @@ class ItemRemoteDataSource(
     private val apiKey: String,
     private val localContext: MyApplication
 ) {
+    private val gson = GsonBuilder().setLenient().create()
+
+    // Создание экземпляра Retrofit с lenient Gson
     private val retrofitBuilder = Retrofit.Builder()
         .baseUrl(hostSource)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
+
 
     private val apiImplement = retrofitBuilder.create(ODMbApiService::class.java)
 

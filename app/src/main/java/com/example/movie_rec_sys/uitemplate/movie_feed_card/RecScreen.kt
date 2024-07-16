@@ -28,13 +28,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movie_rec_sys.viewmodel.MainScreenState
 import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
+import com.example.movie_rec_sys.viewmodel.UserCollectionViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RecScreen(
     viewModel: RecScreenViewModel = viewModel(factory = RecScreenViewModel.Factory),
-    toDetail: (Int, String) -> Unit
+    toDetail: (Int, String) -> Unit,
+    testViewModel: UserCollectionViewModel = viewModel(factory = UserCollectionViewModel.Factory),
 ) {
     val generalUiState by viewModel.generalUiState.collectAsState()
 

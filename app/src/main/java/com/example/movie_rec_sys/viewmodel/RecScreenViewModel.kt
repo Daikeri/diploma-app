@@ -9,12 +9,11 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.movie_rec_sys.MyApplication
-import com.example.movie_rec_sys.data.FirestoreDoc
+import com.example.movie_rec_sys.data.RecommendationDoc
 import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.data.FirestoreRepository
 import com.example.movie_rec_sys.data.ItemRepository
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -71,8 +70,11 @@ class RecScreenViewModel(
             }
         }
     }
+    private fun emptyState(states: List<Triple<String, String, RecommendationDoc>>) {
 
-    private fun initUI(states: List<Triple<String, String, FirestoreDoc>>) {
+    }
+
+    private fun initUI(states: List<Triple<String, String, RecommendationDoc>>) {
         val recScreenContent = getUIStructure(states)
         var commonDelay = 0
         val emptyUI = recScreenContent.keys
@@ -119,7 +121,6 @@ class RecScreenViewModel(
                         content = newHash
                     )
 
-                    delay(60000)
                     stack.add(newHash)
                     _generalUiState.value = newState
                 }
@@ -128,9 +129,9 @@ class RecScreenViewModel(
     }
 
     private fun getUIStructure(
-        states: List<Triple<String, String, FirestoreDoc>>
-    ): MutableMap<String, MutableMap<String, FirestoreDoc>> {
-        val uiComposition: MutableMap<String, MutableMap<String, FirestoreDoc>> = mutableMapOf()
+        states: List<Triple<String, String, RecommendationDoc>>
+    ): MutableMap<String, MutableMap<String, RecommendationDoc>> {
+        val uiComposition: MutableMap<String, MutableMap<String, RecommendationDoc>> = mutableMapOf()
         states.forEach { (_, docId, docContent) ->
             val category = uiComposition.getOrPut(docContent.category) { mutableMapOf() }
             category[docId] = docContent
