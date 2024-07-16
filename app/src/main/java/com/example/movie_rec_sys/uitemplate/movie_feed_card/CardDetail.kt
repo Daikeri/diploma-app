@@ -116,7 +116,7 @@ fun CardDetail(
                                 "firestore_collection" to firestoreCollection.first,
                                 "value" to firestoreCollection.second
                             )
-                            viewModel.uploadUpdates(update = hash)
+                            //viewModel.uploadUpdates(update = hash)
                         },
                         label = label,
                         iconId = iconId)
