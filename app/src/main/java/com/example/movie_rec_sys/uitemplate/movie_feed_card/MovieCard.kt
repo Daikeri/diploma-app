@@ -136,7 +136,6 @@ fun DownloadImage(state:UIComponent, modifier: Modifier) {
 fun Title(state: UIComponent, modifier: Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "")
     key(state) {
-        Log.e("State in Title","")
         val dynamicColor = infiniteTransition.animateColor(
             initialValue = Color(0xFFCAC5CB),
             targetValue = Color(0xFF413F44),

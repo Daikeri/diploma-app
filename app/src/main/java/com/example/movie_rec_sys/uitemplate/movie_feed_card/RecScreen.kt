@@ -59,19 +59,21 @@ fun RecScreen(
             }
         })
 
+    /*
     LaunchedEffect(Unit) {
         if (!needRepeat) {
             viewModel.fetchRec()
             needRepeat = true
         }
     }
+     */
 
     Box(
         modifier = Modifier
             .pullRefresh(pullRefreshState)
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        MyLazyColumns(generalUiState, listState, toDetail)
+        generalUiState?.let { MyLazyColumns(it, listState, toDetail) }
 
         PullRefreshIndicator(
             refreshing = isRefreshing,

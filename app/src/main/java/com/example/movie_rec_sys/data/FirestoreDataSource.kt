@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class FirestoreRepository(
+class FirestoreRemoteSource(
     private val fireStore: FirebaseFirestore,
     var currentUser: FirebaseUser?
 ) {

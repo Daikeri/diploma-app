@@ -9,32 +9,55 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.movie_rec_sys.MyApplication
-import com.example.movie_rec_sys.data.RecommendationDoc
 import com.example.movie_rec_sys.data.Movie
-import com.example.movie_rec_sys.data.FirestoreRepository
+import com.example.movie_rec_sys.data.FirestoreRemoteSource
 import com.example.movie_rec_sys.data.ItemRepository
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RecScreenViewModel(
-    private val firestoreRepos: FirestoreRepository,
+    private val firestoreRepos: FirestoreRemoteSource,
     private val itemRepos: ItemRepository,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
-    private val _generalUiState = MutableStateFlow<MainScreenState>(MainScreenState.getEmptyInstance())
-    val generalUiState: StateFlow<MainScreenState> = _generalUiState
+    private val _generalUiState = MutableStateFlow<MainScreenState?>(null)
+    val generalUiState: StateFlow<MainScreenState?> = _generalUiState
 
     private val _cardUiState = MutableLiveData<CardDetailUiState>()
     val cardUiState = _cardUiState
 
     private var firstExtraction = false
 
-    private lateinit var collectionRecommendation: Job
-
     private var updatesPool = mutableListOf<MutableMap<String, Any?>>()
 
+    init {
+        viewModelScope.launch {
+            itemRepos.recScreenData.collect { uiStruct ->
+                Log.e("emit new state from ItemRepository", "")
+                var commonDelay = 0
+                val uiContent = uiStruct.mapValues { category ->
+                    category.value.mapValues { item ->
+                        val result = if (item.value.second == null)
+                            UIComponent(delay = commonDelay)
+                        else
+                            UIComponent(
+                                item = item.value.second,
+                                rated = item.value.first.rated,
+                                marked = item.value.first.marked,
+                                viewed = item.value.first.viewed
+                            )
+                        commonDelay += 250
+                        result
+                    }
+                }
+                _generalUiState.value = MainScreenState(false, content = uiContent)
+            }
+        }
+    }
+
+
+    /*
     fun fetchRec() {
         viewModelScope.launch {
             firestoreRepos.recommendation.collect { docs ->
@@ -55,7 +78,9 @@ class RecScreenViewModel(
             }
         }
     }
+     */
 
+    /*
     private fun <K, V> deepCopy(map: Map<K, V>): Map<K, V> {
         return map.mapValues { entry ->
             when (entry.value) {
@@ -138,6 +163,8 @@ class RecScreenViewModel(
         }
         return uiComposition
     }
+
+     */
 
     companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
