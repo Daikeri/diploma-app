@@ -1,15 +1,13 @@
 package com.example.movie_rec_sys.uitemplate.movie_feed_card
 
-import android.util.Log
+import androidx.compose.animation.Animatable
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,15 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -40,10 +34,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 import com.example.movie_rec_sys.viewmodel.UIComponent
-import java.nio.file.WatchEvent
+import kotlinx.coroutines.delay
 
 @Composable // 40 symbol max
 fun MovieCard(
@@ -94,6 +87,7 @@ fun MovieCard(
 
 @Composable
 fun ImageStub(state: UIComponent, modifier: Modifier) {
+    /*
     val infiniteTransition = rememberInfiniteTransition(label = "")
 
     key(state) {
@@ -102,10 +96,13 @@ fun ImageStub(state: UIComponent, modifier: Modifier) {
             targetValue = Color(0xFF413F44),
             animationSpec = infiniteRepeatable(
                 animation = keyframes {
-                    durationMillis = state.delay + 2500
-                    Color(0xFFCAC5CB) at state.delay using FastOutSlowInEasing
-                    Color(0xFF413F44) at state.delay + 1000 using FastOutSlowInEasing
-                    Color(0xFFCAC5CB) at state.delay + 2500 using FastOutSlowInEasing
+                     // state.delay + 2500
+                    durationMillis = 1500
+                    delayMillis = 250 * state.downloadIndex
+                    Color(0xFFCAC5CB) at 0 using FastOutSlowInEasing
+                    Color(0xFF413F44) at 750 using FastOutSlowInEasing
+                    Color(0xFFCAC5CB) at 1500 using FastOutSlowInEasing
+                    delayMillis = state.delay - 250
                 },
                 repeatMode = RepeatMode.Restart
             ), label = "")
@@ -117,6 +114,30 @@ fun ImageStub(state: UIComponent, modifier: Modifier) {
             .then(modifier)
         )
     }
+     */
+    val dynamicColor = remember { Animatable(Color(0xFFCAC5CB)) }
+
+    LaunchedEffect(key1 = state.downloadIndex) {
+        delay((state.downloadIndex * 100).toLong())
+        while (true) {
+            dynamicColor.animateTo(
+                targetValue = Color(0xFF413F44),
+                animationSpec = tween(durationMillis = 750, easing = FastOutSlowInEasing)
+            )
+            dynamicColor.animateTo(
+                targetValue = Color(0xFFCAC5CB),
+                animationSpec = tween(durationMillis = 750, easing = FastOutSlowInEasing)
+            )
+            delay((state.repeatDelay - 100).toLong())
+        }
+    }
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .clip(RoundedCornerShape(12.dp))
+        .background(dynamicColor.value)
+        .then(modifier)
+    )
 }
 
 @Composable
@@ -141,10 +162,10 @@ fun Title(state: UIComponent, modifier: Modifier) {
             targetValue = Color(0xFF413F44),
             animationSpec = infiniteRepeatable(
                 animation = keyframes {
-                    durationMillis = state.delay + 2500
-                    Color(0xFFCAC5CB) at state.delay using FastOutSlowInEasing
-                    Color(0xFF413F44) at state.delay + 1000 using FastOutSlowInEasing
-                    Color(0xFFCAC5CB) at state.delay + 2500 using FastOutSlowInEasing
+                    durationMillis = state.repeatDelay + 2500
+                    Color(0xFFCAC5CB) at state.repeatDelay using FastOutSlowInEasing
+                    Color(0xFF413F44) at state.repeatDelay + 1000 using FastOutSlowInEasing
+                    Color(0xFFCAC5CB) at state.repeatDelay + 2500 using FastOutSlowInEasing
                 },
                 repeatMode = RepeatMode.Restart
             ), label = "")

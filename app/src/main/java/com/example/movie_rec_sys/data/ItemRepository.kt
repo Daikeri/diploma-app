@@ -1,6 +1,7 @@
 package com.example.movie_rec_sys.data
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
@@ -14,7 +15,11 @@ class ItemRepository(
     private val recommendationsStruct: MutableMap<String,
             MutableMap<String, Pair<RecommendationDoc, Movie?>>> = mutableMapOf()
 
-    private val userCollectionStruct: MutableMap<String, Movie> = mutableMapOf()
+    private val userCollectionStruct: MutableMap<String,
+            MutableMap<String, Pair<UserCollectionDoc, Movie?>>> = mutableMapOf(
+                "views" to mutableMapOf(),
+                "marked" to mutableMapOf()
+            )
 
     val recScreenData = flow<MutableMap<String,
     MutableMap<String, Pair<RecommendationDoc, Movie?>>>> {
@@ -27,19 +32,39 @@ class ItemRepository(
                     }
                 }
             }
-            emit(recommendationsStruct)
 
+            emit(recommendationsStruct)
+            delay(10000)
             recommendationsStruct.keys.forEach { category ->
                 recommendationsStruct[category]!!.forEach { item ->
-                    val networkResult = updatedGetUserItem(itemID = item.value.first.itemId)
-                    sharedItems[item.value.first.itemId] = networkResult
-                    recommendationsStruct[category]?.set(item.key, Pair(item.value.first, networkResult))
+                    val targetItem = sharedItems.getOrPut(item.value.first.itemId) {
+                        updatedGetUserItem(itemID = item.value.first.itemId)
+                    }
+                    recommendationsStruct[category]?.set(item.key, Pair(item.value.first, targetItem))
                     emit(recommendationsStruct)
                 }
             }
         }
 
     }.flowOn(Dispatchers.IO)
+
+    val userCollectionData = flow<MutableMap<String,
+    MutableMap<String, Pair<UserCollectionDoc, Movie?>>>> {
+        firestoreRS.usersCollection.collect { updates ->
+            updates.forEach { (actionFlag, docID, docContent) ->
+                when(actionFlag) {
+                    "ADDED" -> {
+                        if (docContent.viewed || docContent.rated!= null)
+                            userCollectionStruct["views"]!![docID] = Pair(docContent, null)
+                        if (docContent.marked)
+                            userCollectionStruct["marked"]!![docID] = Pair(docContent, null)
+                    }
+                }
+            }
+
+            emit(userCollectionStruct)
+        }
+    }
 
 
     suspend fun getUserItem(docID: String, itemID: String): Movie {

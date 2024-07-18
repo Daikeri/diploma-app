@@ -35,11 +35,15 @@ class RecScreenViewModel(
         viewModelScope.launch {
             itemRepos.recScreenData.collect { uiStruct ->
                 Log.e("emit new state from ItemRepository", "")
-                var commonDelay = 0
+                var indexesCount = 0
+                val lastElement = (uiStruct.size * 10 - 1) * 100
                 val uiContent = uiStruct.mapValues { category ->
                     category.value.mapValues { item ->
                         val result = if (item.value.second == null)
-                            UIComponent(delay = commonDelay)
+                            UIComponent(
+                                repeatDelay = lastElement,
+                                downloadIndex = indexesCount
+                            )
                         else
                             UIComponent(
                                 item = item.value.second,
@@ -47,7 +51,7 @@ class RecScreenViewModel(
                                 marked = item.value.first.marked,
                                 viewed = item.value.first.viewed
                             )
-                        commonDelay += 250
+                        indexesCount += 1
                         result
                     }
                 }
@@ -205,7 +209,8 @@ data class UIComponent(
     val rated: Int?=null,
     val viewed: Boolean = false,
     val marked: Boolean = false,
-    val delay: Int = 0
+    val repeatDelay: Int = 0,
+    val downloadIndex: Int =0
 )
 
 data class MainScreenState(
