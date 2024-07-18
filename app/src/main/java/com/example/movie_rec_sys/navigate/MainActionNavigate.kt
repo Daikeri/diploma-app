@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
@@ -12,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,8 +20,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.movie_rec_sys.uitemplate.movie_feed_card.CardDetail
-import com.example.movie_rec_sys.uitemplate.movie_feed_card.RecScreen
+import com.example.movie_rec_sys.uitemplate.recommendation.CardDetail
+import com.example.movie_rec_sys.uitemplate.recommendation.RecScreen
 import com.example.movie_rec_sys.uitemplate.action.MyNavBottomBar
 import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 

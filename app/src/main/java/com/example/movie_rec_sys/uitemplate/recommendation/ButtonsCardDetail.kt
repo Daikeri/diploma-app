@@ -1,4 +1,4 @@
-package com.example.movie_rec_sys.uitemplate.movie_feed_card
+package com.example.movie_rec_sys.uitemplate.recommendation
 
 import androidx.compose.ui.graphics.Color
 import com.example.movie_rec_sys.R

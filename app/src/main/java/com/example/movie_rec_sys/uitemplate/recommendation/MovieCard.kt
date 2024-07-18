@@ -1,12 +1,7 @@
-package com.example.movie_rec_sys.uitemplate.movie_feed_card
+package com.example.movie_rec_sys.uitemplate.recommendation
 
 import androidx.compose.animation.Animatable
-import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -87,48 +81,20 @@ fun MovieCard(
 
 @Composable
 fun ImageStub(state: UIComponent, modifier: Modifier) {
-    /*
-    val infiniteTransition = rememberInfiniteTransition(label = "")
-
-    key(state) {
-        val dynamicColor = infiniteTransition.animateColor(
-            initialValue = Color(0xFFCAC5CB),
-            targetValue = Color(0xFF413F44),
-            animationSpec = infiniteRepeatable(
-                animation = keyframes {
-                     // state.delay + 2500
-                    durationMillis = 1500
-                    delayMillis = 250 * state.downloadIndex
-                    Color(0xFFCAC5CB) at 0 using FastOutSlowInEasing
-                    Color(0xFF413F44) at 750 using FastOutSlowInEasing
-                    Color(0xFFCAC5CB) at 1500 using FastOutSlowInEasing
-                    delayMillis = state.delay - 250
-                },
-                repeatMode = RepeatMode.Restart
-            ), label = "")
-
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .clip(RoundedCornerShape(12.dp))
-            .background(dynamicColor.value)
-            .then(modifier)
-        )
-    }
-     */
     val dynamicColor = remember { Animatable(Color(0xFFCAC5CB)) }
 
     LaunchedEffect(key1 = state.downloadIndex) {
-        delay((state.downloadIndex * 100).toLong())
+        delay((state.downloadIndex * 250).toLong())
         while (true) {
             dynamicColor.animateTo(
                 targetValue = Color(0xFF413F44),
-                animationSpec = tween(durationMillis = 750, easing = FastOutSlowInEasing)
+                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
             )
             dynamicColor.animateTo(
                 targetValue = Color(0xFFCAC5CB),
-                animationSpec = tween(durationMillis = 750, easing = FastOutSlowInEasing)
+                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
             )
-            delay((state.repeatDelay - 100).toLong())
+            delay((state.repeatDelay + 250).toLong())
         }
     }
 
@@ -155,42 +121,43 @@ fun DownloadImage(state:UIComponent, modifier: Modifier) {
 
 @Composable
 fun Title(state: UIComponent, modifier: Modifier) {
-    val infiniteTransition = rememberInfiniteTransition(label = "")
-    key(state) {
-        val dynamicColor = infiniteTransition.animateColor(
-            initialValue = Color(0xFFCAC5CB),
-            targetValue = Color(0xFF413F44),
-            animationSpec = infiniteRepeatable(
-                animation = keyframes {
-                    durationMillis = state.repeatDelay + 2500
-                    Color(0xFFCAC5CB) at state.repeatDelay using FastOutSlowInEasing
-                    Color(0xFF413F44) at state.repeatDelay + 1000 using FastOutSlowInEasing
-                    Color(0xFFCAC5CB) at state.repeatDelay + 2500 using FastOutSlowInEasing
-                },
-                repeatMode = RepeatMode.Restart
-            ), label = "")
+    val dynamicColor = remember { Animatable(Color(0xFFCAC5CB)) }
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .then(modifier)
-        ) {
-            Text(
-                text = if (state.item != null) state.item!!.title else "",
-                textAlign = TextAlign.Start,
-                fontSize = 14.sp,
-                maxLines = 2,
-                color = Color(0xFF615C69),//MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .then(
-                        if (state.item != null)
-                            Modifier
-                        else
-                            Modifier.background(dynamicColor.value)
-                    )
+    LaunchedEffect(key1 = state.downloadIndex) {
+        delay((state.downloadIndex * 250).toLong())
+        while (true) {
+            dynamicColor.animateTo(
+                targetValue = Color(0xFF413F44),
+                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
             )
+            dynamicColor.animateTo(
+                targetValue = Color(0xFFCAC5CB),
+                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+            )
+            delay((state.repeatDelay + 250).toLong())
         }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .then(modifier)
+    ) {
+        Text(
+            text = if (state.item != null) state.item!!.title else "",
+            textAlign = TextAlign.Start,
+            fontSize = 14.sp,
+            maxLines = 2,
+            color = Color(0xFF64558F),//MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .then(
+                    if (state.item != null)
+                        Modifier
+                    else
+                        Modifier.background(dynamicColor.value)
+                )
+        )
     }
 }

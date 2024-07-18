@@ -1,4 +1,4 @@
-package com.example.movie_rec_sys.uitemplate.movie_feed_card
+package com.example.movie_rec_sys.uitemplate.recommendation
 
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
@@ -27,7 +27,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment

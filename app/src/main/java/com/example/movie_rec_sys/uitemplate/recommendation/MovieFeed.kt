@@ -1,10 +1,8 @@
-package com.example.movie_rec_sys.uitemplate.movie_feed_card
+package com.example.movie_rec_sys.uitemplate.recommendation
 
-import android.util.Log
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -21,7 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Surface
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,6 +51,50 @@ fun MovieFeed(
         ), label = ""
     )
 
+
+    Surface(
+        elevation = 4.dp,
+        shape = RoundedCornerShape(12.dp),
+        color = Color(0xFFF7F2FA),//.colorScheme.surfaceContainerLowest,
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(color = Color(0xFFF7F2FA)) //MaterialTheme.colorScheme.surfaceDim
+            // .padding(vertical = 10.dp)
+
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 6.dp, end = 6.dp, bottom = 10.dp, top = 4.dp)
+
+            ) {
+                Text(
+                    text = if (skeletonLoader) "" else categoryName,
+                    color = Color(0xFF615B71),
+                    modifier = Modifier.then(
+                        if (skeletonLoader)
+                            Modifier.background(alpha)
+                        else
+                            Modifier
+                    )
+                )
+                Text(text = "All", color = Color(0xFF615B71))
+            }
+
+            UpdatedContent(
+                cardContent = cardContent,
+                categoryName = categoryName,
+                toDetail = toDetail
+            )
+        }
+    }
+
+    /*
     Box(
         modifier = Modifier
             .padding(vertical = 8.dp)
@@ -67,7 +108,7 @@ fun MovieFeed(
             Column(
                 Modifier
                     .fillMaxSize()
-                    .background(color = Color(0xFFEEE7F6)) //MaterialTheme.colorScheme.surfaceDim
+                    .background(color = Color(0xFFF7F2FA)) //MaterialTheme.colorScheme.surfaceDim
                    // .padding(vertical = 10.dp)
 
             ) {
@@ -99,6 +140,8 @@ fun MovieFeed(
             }
         }
     }
+
+     */
 }
 
 @Composable

@@ -1,5 +1,6 @@
 package com.example.movie_rec_sys.data
 
+import kotlinx.coroutines.Delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
@@ -32,15 +33,15 @@ class ItemRepository(
                     }
                 }
             }
-
             emit(recommendationsStruct)
-            delay(10000)
+
             recommendationsStruct.keys.forEach { category ->
                 recommendationsStruct[category]!!.forEach { item ->
                     val targetItem = sharedItems.getOrPut(item.value.first.itemId) {
                         updatedGetUserItem(itemID = item.value.first.itemId)
                     }
                     recommendationsStruct[category]?.set(item.key, Pair(item.value.first, targetItem))
+                    delay(500)
                     emit(recommendationsStruct)
                 }
             }
@@ -61,7 +62,6 @@ class ItemRepository(
                     }
                 }
             }
-
             emit(userCollectionStruct)
         }
     }
