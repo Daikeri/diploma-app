@@ -1,13 +1,12 @@
 package com.example.movie_rec_sys.data
 
-import kotlinx.coroutines.Delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
-class ItemRepository(
+class FSRepository(
     private val dataSource: ItemRemoteDataSource,
     private val firestoreRS: FirestoreRemoteSource
 ) {
@@ -37,9 +36,7 @@ class ItemRepository(
 
             recommendationsStruct.keys.forEach { category ->
                 recommendationsStruct[category]!!.forEach { item ->
-                    val targetItem = sharedItems.getOrPut(item.value.first.itemId) {
-                        updatedGetUserItem(itemID = item.value.first.itemId)
-                    }
+                    val targetItem = dataSource.getItem(item.value.first.itemId)
                     recommendationsStruct[category]?.set(item.key, Pair(item.value.first, targetItem))
                     delay(500)
                     emit(recommendationsStruct)
@@ -66,9 +63,7 @@ class ItemRepository(
 
             userCollectionStruct.keys.forEach { collection ->
                 userCollectionStruct[collection]!!.forEach { item ->
-                    val targetItem = sharedItems.getOrPut(item.value.first.itemId) {
-                        updatedGetUserItem(itemID = item.value.first.itemId)
-                    }
+                    val targetItem = dataSource.getItem(item.value.first.itemId)
                     userCollectionStruct[collection]?.set(item.key, Pair(item.value.first, targetItem))
                     delay(500)
                     emit(userCollectionStruct)
@@ -81,24 +76,13 @@ class ItemRepository(
         return recommendationsStruct[category]!![document]
     }
 
-
-    suspend fun getUserItem(docID: String, itemID: String): Movie {
-        val networkResult = withContext(Dispatchers.IO) {
-            dataSource.fetchItem(itemID)
-        }
-        sharedItems[docID] = networkResult
-        return networkResult
-    }
-
     private suspend fun updatedGetUserItem(itemID: String): Movie {
-        return withContext(Dispatchers.IO) {
-            dataSource.fetchItem(itemID)
-        }
+        return dataSource.getItem(itemID)
     }
     
     suspend fun withoutCash(itemID: String): Movie {
         val networkResult = withContext(Dispatchers.IO) {
-            dataSource.fetchItem(itemID)
+            dataSource.downloadItem(itemID)
         }
         return networkResult
     }

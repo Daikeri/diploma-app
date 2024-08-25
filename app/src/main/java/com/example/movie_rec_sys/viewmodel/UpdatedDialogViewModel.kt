@@ -11,14 +11,14 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.movie_rec_sys.MyApplication
 import com.example.movie_rec_sys.data.FirestoreRemoteSource
 import com.example.movie_rec_sys.data.GenresData
-import com.example.movie_rec_sys.data.ItemRepository
+import com.example.movie_rec_sys.data.FSRepository
 import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.data.PrimaryRecRepository
 import kotlinx.coroutines.launch
 
 class UpdatedDialogViewModel(
     private val primaryRepos: PrimaryRecRepository,
-    private val itemRepos: ItemRepository,
+    private val itemRepos: FSRepository,
     private val firestoreRepos: FirestoreRemoteSource,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {

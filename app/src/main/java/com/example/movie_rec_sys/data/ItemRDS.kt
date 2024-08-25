@@ -21,20 +21,25 @@ class ItemRemoteDataSource(
 ) {
     private val gson = GsonBuilder().setLenient().create()
 
-    // Создание экземпляра Retrofit с lenient Gson
+    private val sharedItems: MutableMap<String, Movie> = mutableMapOf()
+
     private val retrofitBuilder = Retrofit.Builder()
         .baseUrl(hostSource)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
 
-
     private val apiImplement = retrofitBuilder.create(ODMbApiService::class.java)
 
-    suspend fun fetchItem(id: String, otherApiKey: String=apiKey) : Movie {
+     suspend fun downloadItem(id: String, otherApiKey: String=apiKey): Movie {
         val item = apiImplement.getMovieDetails(otherApiKey, id)
         val downloadResult = downloadImage(item.poster)
         item.downloadImage = downloadResult
+        sharedItems[id] = item
         return item
+    }
+
+    suspend fun getItem(id: String): Movie {
+        return sharedItems.getOrPut(id) { downloadItem(id) }
     }
 
     private suspend fun downloadImage(url: String): ImageBitmap? {
@@ -42,22 +47,17 @@ class ItemRemoteDataSource(
             .crossfade(true)
             .build()
 
-        // Создание ImageRequest
         val request = ImageRequest.Builder(localContext)
             .data(url)
             .build()
 
-        // Выполнение запроса и загрузка изображения
         val result: ImageResult = imageLoader.execute(request)
 
-        // Проверка успешного завершения загрузки
-        if (result is SuccessResult) {
+        return if (result is SuccessResult) {
             val drawable = result.drawable
-            // Преобразование Drawable в ImageBitmap
-            return drawable.toBitmap().asImageBitmap()
+            drawable.toBitmap().asImageBitmap()
         } else {
-            // Обработка ошибки загрузки изображения
-            return null
+            null
         }
     }
 }

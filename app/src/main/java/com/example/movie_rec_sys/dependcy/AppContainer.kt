@@ -8,7 +8,7 @@ import com.example.movie_rec_sys.data.DBRepository
 import com.example.movie_rec_sys.data.FirebaseAuthRepository
 import com.example.movie_rec_sys.data.FirestoreRemoteSource
 import com.example.movie_rec_sys.data.ItemRemoteDataSource
-import com.example.movie_rec_sys.data.ItemRepository
+import com.example.movie_rec_sys.data.FSRepository
 import com.example.movie_rec_sys.data.PrimaryRecDataSource
 import com.example.movie_rec_sys.data.PrimaryRecRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -26,12 +26,12 @@ class AppContainer(myApplication: MyApplication) {
 
     private val itemSource = "http://www.omdbapi.com"
     private val apiKey =  "67bd6ed"//"67bd6ed" f75f8380
-    private val itemDS = ItemRemoteDataSource(itemSource, apiKey, myApplication)
+    private val itemRDS = ItemRemoteDataSource(itemSource, apiKey, myApplication)
 
 
     private val fireStore = Firebase.firestore
     var fireStoreRepos = FirestoreRemoteSource(fireStore, fireBaseAuth.currentUser)
-    val itemRepos = ItemRepository(itemDS, fireStoreRepos)
+    val itemRepos = FSRepository(itemRDS, fireStoreRepos)
 
     private val db = Room.databaseBuilder(
         context = myApplication,
@@ -41,7 +41,10 @@ class AppContainer(myApplication: MyApplication) {
         .createFromAsset("D:\\AndroidProjects\\DiplomaApp\\app\\src\\main\\assets\\items.db")
         .build()
 
-    val dbRepos = DBRepository(db)
+    val dbRepos = DBRepository(
+        db,
+        itemRDS
+    )
 
     init {
         fireBaseRepos.addCallback { fireStoreRepos.setNewUser(it) }

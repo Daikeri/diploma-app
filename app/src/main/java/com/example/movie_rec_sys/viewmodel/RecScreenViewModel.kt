@@ -11,14 +11,14 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.movie_rec_sys.MyApplication
 import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.data.FirestoreRemoteSource
-import com.example.movie_rec_sys.data.ItemRepository
+import com.example.movie_rec_sys.data.FSRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RecScreenViewModel(
     private val firestoreRepos: FirestoreRemoteSource,
-    private val itemRepos: ItemRepository,
+    private val itemRepos: FSRepository,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
     private val _generalUiState = MutableStateFlow<RecScreenCommonUiState?>(null)

@@ -1,6 +1,5 @@
 package com.example.movie_rec_sys.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -9,13 +8,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.movie_rec_sys.MyApplication
 import com.example.movie_rec_sys.data.FirestoreRemoteSource
-import com.example.movie_rec_sys.data.ItemRepository
+import com.example.movie_rec_sys.data.FSRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class UserCollectionViewModel(
-    private val itemRepos: ItemRepository,
+    private val itemRepos: FSRepository,
     private val firestoreRepos: FirestoreRemoteSource,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
