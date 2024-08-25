@@ -1,6 +1,17 @@
 package com.example.movie_rec_sys.navigate
 
 import android.util.Log
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.ExperimentalMaterialApi
@@ -11,8 +22,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.AbsoluteAlignment
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -23,6 +38,7 @@ import androidx.navigation.navArgument
 import com.example.movie_rec_sys.uitemplate.recommendation.CardDetail
 import com.example.movie_rec_sys.uitemplate.recommendation.RecScreen
 import com.example.movie_rec_sys.uitemplate.action.MyNavBottomBar
+import com.example.movie_rec_sys.uitemplate.search.SearchScreen
 import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 
 
@@ -73,12 +89,14 @@ fun MainActionScreen() {
                 )
             }
             composable(MainActionRoute.LIST) {}
-            composable(MainActionRoute.SEARCH) {}
+            composable(MainActionRoute.SEARCH) {
+                SearchScreen()
+            }
             composable(MainActionRoute.PROFILE) {}
             composable(
-                route = "${MainActionRoute.DETAIL}/{categoryIndex}/{movieId}",
+                route = "${MainActionRoute.DETAIL}/{categoryName}/{movieId}",
                 arguments = listOf(
-                    navArgument("categoryIndex") { type = NavType.IntType },
+                    navArgument("categoryName") { type = NavType.StringType },
                     navArgument("movieId") { type = NavType.StringType }
                 )
             ) {
@@ -86,12 +104,13 @@ fun MainActionScreen() {
                     tabsNavController.getBackStackEntry(MainActionRoute.PERSONAL)
                 }
                 val parentViewModel: RecScreenViewModel = viewModel(parentEntry)
-                val categoryIndex = it.arguments!!.getInt("categoryIndex")
+                val categoryName = it.arguments!!.getString("categoryName") ?: ""
                 val movieId: String = it.arguments!!.getString("movieId") ?: ""
-                CardDetail(categoryIndex, movieId, viewModel = parentViewModel)
+                CardDetail(categoryName, movieId, viewModel = parentViewModel)
             }
 
         }
         MyNavBottomBar(tabsNavController)
     }
 }
+

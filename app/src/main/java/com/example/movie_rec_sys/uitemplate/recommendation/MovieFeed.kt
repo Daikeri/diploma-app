@@ -8,7 +8,6 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,16 +23,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import com.example.movie_rec_sys.viewmodel.UIComponent
+import com.example.movie_rec_sys.viewmodel.RecScreenComponentUiState
 
 @Composable
 fun MovieFeed(
     categoryName: String,
-    cardContent: Map<String, UIComponent>,
+    cardContent: Map<String, RecScreenComponentUiState>,
     skeletonLoader: Boolean,
-    toDetail: (Int, String) -> Unit,
+    toDetail: (String, String) -> Unit,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "")
 
@@ -145,7 +143,7 @@ fun MovieFeed(
 }
 
 @Composable
-fun UpdatedContent(cardContent: Map<String, UIComponent>, categoryName: String, toDetail: (Int, String) -> Unit) {
+fun UpdatedContent(cardContent: Map<String, RecScreenComponentUiState>, categoryName: String, toDetail: (String, String) -> Unit) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(15.dp),

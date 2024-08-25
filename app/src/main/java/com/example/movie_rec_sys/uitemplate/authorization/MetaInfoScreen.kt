@@ -3,6 +3,7 @@ package com.example.movie_rec_sys.uitemplate.authorization
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -62,7 +63,10 @@ fun GenderScreen(
 
     var dynamicHeight = if (choose) 260.dp else 190.dp
 
-    val animateHeight by animateDpAsState(targetValue = dynamicHeight, label = "")
+    val animateHeight by animateDpAsState(
+        animationSpec = tween(500, easing = customEasing),
+        targetValue = dynamicHeight,
+        label = "")
 
     Column(
         modifier = Modifier
@@ -173,7 +177,10 @@ fun AgeGroupScreen(
 
     var dynamicHeight = if (choose) 260.dp else 190.dp
 
-    val animateHeight by animateDpAsState(targetValue = dynamicHeight, label = "")
+    val animateHeight by animateDpAsState(
+        animationSpec = tween(500, easing = customEasing),
+        targetValue = dynamicHeight,
+        label = "")
 
     Column(
         modifier = Modifier
@@ -330,4 +337,30 @@ fun CardWithIcon(
             )
         }
     }
+}
+
+
+val customEasing = Easing { fraction ->
+    // Функция вычисления кривой по аналогии с PathInterpolator
+    when {
+        fraction < 0.166666f -> {
+            // Первая кривая
+            val t = fraction / 0.166666f
+            cubicBezier(t, 0.05f, 0f, 0.133333f, 0.06f, 0.166666f, 0.4f)
+        }
+        else -> {
+            // Вторая кривая
+            val t = (fraction - 0.166666f) / (1f - 0.166666f)
+            cubicBezier(t, 0.208333f, 0.82f, 0.25f, 1f, 1f, 1f)
+        }
+    }
+}
+
+// Вспомогательная функция для вычисления значений на кривой Безье
+fun cubicBezier(t: Float, p0: Float, p1: Float, p2: Float, p3: Float, p4: Float, p5: Float): Float {
+    val u = 1f - t
+    return u * u * u * p0 +
+            3f * u * u * t * p1 +
+            3f * u * t * t * p2 +
+            t * t * t * p3
 }

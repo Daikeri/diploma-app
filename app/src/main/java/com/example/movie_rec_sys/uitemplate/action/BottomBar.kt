@@ -24,11 +24,13 @@ object Tabs {
             icon = Icons.Rounded.Home,
             label = "Главная"
         ),
+        /*
         MainActionTab(
             route = MainActionRoute.LIST,
             icon = Icons.Rounded.Favorite,
             label = "Мое"
         ),
+         */
         MainActionTab(
             route = MainActionRoute.SEARCH,
             icon = Icons.Rounded.Search,

@@ -47,11 +47,14 @@ import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
+import androidx.compose.material.Surface
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -59,7 +62,7 @@ import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun CardDetail(
-    categoryIndex: Int,
+    categoryName: String,
     docID: String,
     viewModel: RecScreenViewModel = viewModel()
 ) {
@@ -92,7 +95,7 @@ fun CardDetail(
                 .fillMaxWidth()
                 .height(300.dp)
         ) {
-            Picture(image = cardUiState.item.downloadImage)
+            Picture(image = cardUiState.item.downloadImage!!)
         }
 
         Row(
@@ -125,12 +128,27 @@ fun CardDetail(
 
         TagBar(tags, modifier = Modifier.padding(4.dp))
 
-        Text(
-            text = cardUiState.item.plot,
-            modifier = Modifier.padding(4.dp),
-            textAlign = TextAlign.Justify,
-            fontSize = 14.sp
-        )
+        Surface(
+            elevation = 4.dp
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 10.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFFF7F2FA))
+            ) {
+                Text(
+                    text = cardUiState.item.plot,
+                    textAlign = TextAlign.Justify,
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center)
+                        .padding(8.dp)
+                )
+            }
+        }
     }
 }
 
@@ -173,30 +191,25 @@ fun ActiveButton(
 }
 
 @Composable
-fun Picture(image: ImageBitmap?) {
-    image?.let {
-        Image(
-            bitmap = blurBitmap(
-                LocalContext.current.applicationContext,
-                it,
-                25.0F
-            ),
-            contentDescription = null,
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier
-                .fillMaxSize()
-        )
+fun Picture(image: ImageBitmap) {
+    Image(
+        bitmap = image,
+        contentDescription = null,
+        contentScale = ContentScale.FillBounds,
+        modifier = Modifier
+            .fillMaxSize()
+            .blur(50.dp)
+    )
 
-        Image(
-            bitmap = it,
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(204.dp)
-                .padding(4.dp)
-                .clip(RoundedCornerShape(28.dp))
-        )
-    }
+    Image(
+        bitmap = image,
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(204.dp)
+            .padding(4.dp)
+            .clip(RoundedCornerShape(28.dp))
+    )
 }
 
 @OptIn(ExperimentalMaterialApi::class)

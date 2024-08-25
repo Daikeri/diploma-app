@@ -63,7 +63,22 @@ class ItemRepository(
                 }
             }
             emit(userCollectionStruct)
+
+            userCollectionStruct.keys.forEach { collection ->
+                userCollectionStruct[collection]!!.forEach { item ->
+                    val targetItem = sharedItems.getOrPut(item.value.first.itemId) {
+                        updatedGetUserItem(itemID = item.value.first.itemId)
+                    }
+                    userCollectionStruct[collection]?.set(item.key, Pair(item.value.first, targetItem))
+                    delay(500)
+                    emit(userCollectionStruct)
+                }
+            }
         }
+    }
+
+    fun getItem(category: String, document: String): Pair<RecommendationDoc, Movie?>? {
+        return recommendationsStruct[category]!![document]
     }
 
 

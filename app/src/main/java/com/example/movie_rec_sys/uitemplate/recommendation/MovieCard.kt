@@ -29,23 +29,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
-import com.example.movie_rec_sys.viewmodel.UIComponent
+import com.example.movie_rec_sys.viewmodel.RecScreenComponentUiState
 import kotlinx.coroutines.delay
 
 @Composable // 40 symbol max
 fun MovieCard(
     categoryName: String,
     docID: String,
-    state: UIComponent,
-    toDetail: (Int, String) -> Unit,
+    state: RecScreenComponentUiState,
+    toDetail: (String, String) -> Unit,
     viewModel: RecScreenViewModel = viewModel()
 ) {
     val isDownload = state.item!=null
 
     Card(
         onClick = {
-            //viewModel.onUserChooseItem(categoryName, docID)
-            //toDetail(categoryName, docID)
+            viewModel.onUserChooseItem(categoryName, docID)
+            toDetail(categoryName, docID)
         },
         colors = CardDefaults.cardColors(
             containerColor =  MaterialTheme.colorScheme.primary.copy(alpha=0f)
@@ -80,7 +80,7 @@ fun MovieCard(
 }
 
 @Composable
-fun ImageStub(state: UIComponent, modifier: Modifier) {
+fun ImageStub(state: RecScreenComponentUiState, modifier: Modifier) {
     val dynamicColor = remember { Animatable(Color(0xFFCAC5CB)) }
 
     LaunchedEffect(key1 = state.downloadIndex) {
@@ -107,7 +107,7 @@ fun ImageStub(state: UIComponent, modifier: Modifier) {
 }
 
 @Composable
-fun DownloadImage(state:UIComponent, modifier: Modifier) {
+fun DownloadImage(state:RecScreenComponentUiState, modifier: Modifier) {
     Image(
         bitmap = state.item!!.downloadImage!!,
         contentDescription = null,
@@ -120,7 +120,7 @@ fun DownloadImage(state:UIComponent, modifier: Modifier) {
 }
 
 @Composable
-fun Title(state: UIComponent, modifier: Modifier) {
+fun Title(state: RecScreenComponentUiState, modifier: Modifier) {
     val dynamicColor = remember { Animatable(Color(0xFFCAC5CB)) }
 
     LaunchedEffect(key1 = state.downloadIndex) {

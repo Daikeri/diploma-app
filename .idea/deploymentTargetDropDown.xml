@@ -5,14 +5,27 @@
       <entry key="MyDialog">
         <State />
       </entry>
-      <entry key="SkeletonLoaderScreenPreview">
+      <entry key="SearchScreen">
         <State />
       </entry>
       <entry key="UserCollectionScreen">
         <State />
       </entry>
       <entry key="app">
-        <State />
+        <State>
+          <runningDeviceTargetSelectedWithDropDown>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="SERIAL_NUMBER" />
+                  <value value="36071FDH20056X" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-08-23T21:46:05.850516Z" />
+        </State>
       </entry>
     </value>
   </component>

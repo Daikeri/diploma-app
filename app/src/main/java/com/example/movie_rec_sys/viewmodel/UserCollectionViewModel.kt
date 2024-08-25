@@ -26,14 +26,7 @@ class UserCollectionViewModel(
     init {
         viewModelScope.launch {
             firestoreRepos.usersCollection.collect { updates ->
-                Log.e("${updates.size}", "")
-                updates.forEach { (actionFlag, docId, docContent) ->
-                    when(actionFlag) {
-                        "ADDED" -> {}
-                        "MODIFIED" -> {}
-                        "REMOVED" -> {}
-                    }
-                }
+
             }
         }
     }

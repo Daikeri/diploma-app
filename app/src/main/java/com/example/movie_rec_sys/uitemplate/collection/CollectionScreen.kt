@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -23,11 +24,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movie_rec_sys.R
+import com.example.movie_rec_sys.viewmodel.UserCollectionViewModel
 
 @Preview
 @Composable
-fun UserCollectionScreen() {
+fun UserCollectionScreen(
+    viewModel:UserCollectionViewModel = viewModel(factory = UserCollectionViewModel.Factory)
+) {
     Surface(
         color = Color(0xFFFDF7FF),
         modifier = Modifier
@@ -39,9 +44,10 @@ fun UserCollectionScreen() {
                 .padding(horizontal = 16.dp)
                 .fillMaxSize()
         ) {
+
             item {
                 CategoryCard(label = "Вы хотели посмотреть",
-                    imagePath = R.drawable.bookmark_star,
+                    imagePath = R.drawable.bookmark_star_30,
                     Modifier
                         .height(200.dp)
                         .padding(bottom = 10.dp))
@@ -50,7 +56,7 @@ fun UserCollectionScreen() {
             item {
                 CategoryCard(
                     label = "Оцененное/Просмотренное",
-                    imagePath = R.drawable.color_favorite,
+                    imagePath = R.drawable.favorite_30,
                     Modifier
                         .height(200.dp)
                         .padding(bottom = 10.dp)
@@ -60,7 +66,7 @@ fun UserCollectionScreen() {
             item {
                 CategoryCard(
                     label = "Добавить папку",
-                    imagePath = R.drawable.append,
+                    imagePath = R.drawable.add_30,
                     Modifier
                         .height(200.dp)
                         .fillMaxHeight()
@@ -90,7 +96,7 @@ fun CategoryCard(label: String, imagePath: Int, modifier: Modifier) {
             Image(painter = painterResource(id = imagePath), contentDescription = null)
             Text(
                 text = label,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 color = Color(0xFF1C1B20)
             )
         }

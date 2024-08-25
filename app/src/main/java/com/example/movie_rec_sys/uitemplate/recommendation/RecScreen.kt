@@ -3,20 +3,14 @@ package com.example.movie_rec_sys.uitemplate.recommendation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Surface
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,11 +21,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.movie_rec_sys.viewmodel.MainScreenState
+import com.example.movie_rec_sys.viewmodel.RecScreenCommonUiState
 import com.example.movie_rec_sys.viewmodel.RecScreenViewModel
 import com.example.movie_rec_sys.viewmodel.UserCollectionViewModel
 import kotlinx.coroutines.launch
@@ -40,7 +33,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun RecScreen(
     viewModel: RecScreenViewModel = viewModel(factory = RecScreenViewModel.Factory),
-    toDetail: (Int, String) -> Unit,
+    toDetail: (String, String) -> Unit,
     testViewModel: UserCollectionViewModel = viewModel(factory = UserCollectionViewModel.Factory),
 ) {
     val generalUiState by viewModel.generalUiState.collectAsState()
@@ -89,7 +82,7 @@ fun RecScreen(
 }
 
 @Composable
-fun MyLazyColumns(generalUiState: MainScreenState, listState: LazyListState, toDetail: (Int, String) -> Unit) {
+fun MyLazyColumns(generalUiState: RecScreenCommonUiState, listState: LazyListState, toDetail: (String, String) -> Unit) {
     LazyColumn(
         contentPadding = PaddingValues(vertical = 8.dp),
         state = listState,
