@@ -38,7 +38,8 @@ class AppContainer(myApplication: MyApplication) {
         AppDB::class.java,
         "database"
     )
-        .createFromAsset("D:\\AndroidProjects\\DiplomaApp\\app\\src\\main\\assets\\items.db")
+        .createFromAsset("movies.db")
+        .fallbackToDestructiveMigration()
         .build()
 
     val dbRepos = DBRepository(

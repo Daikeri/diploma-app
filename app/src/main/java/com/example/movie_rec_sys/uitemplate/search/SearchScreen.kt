@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -36,9 +37,11 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,26 +53,49 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.movie_rec_sys.R
+import com.example.movie_rec_sys.viewmodel.SearchViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.movie_rec_sys.viewmodel.SearchUiStateComponent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Preview
 @Composable
-fun SearchScreen() {
+fun SearchScreen(viewModel: SearchViewModel = viewModel(factory = SearchViewModel.Factory)) {
     Box(modifier = Modifier
         .fillMaxSize()
     ) {
-        MySearchBar(modifier = Modifier.align(Alignment.TopCenter))
+        val uiState by viewModel.uiState.collectAsState()
+        val localScope = rememberCoroutineScope()
+
+        MySearchBar(
+            state = uiState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        ) {
+            localScope.launch {
+                viewModel.findMovieByTitle(it)
+            }
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MySearchBar(modifier: Modifier = Modifier) {
+fun MySearchBar(
+    state: Map<String, SearchUiStateComponent>,
+    modifier: Modifier = Modifier,
+    findMovieByTitle: (String) -> Unit,
+) {
     var inputQuery by remember { mutableStateOf("") }
     var isActive by remember { mutableStateOf(false) }
 
     SearchBar(
         query = inputQuery,
-        onQueryChange = { inputQuery = it } ,
+        onQueryChange = {
+            inputQuery = it
+            findMovieByTitle(inputQuery)
+        },
         onSearch = { isActive = !isActive },
         active = isActive,
         onActiveChange = { isActive = !isActive },
@@ -79,7 +105,7 @@ fun MySearchBar(modifier: Modifier = Modifier) {
         modifier = Modifier
             .then(modifier)
     ) {
-        SearchContent()
+        SearchContent(state)
     }
 }
 @Composable
@@ -107,7 +133,10 @@ fun LeadingIcon(isActive: Boolean, change: () -> Unit)  {
 
 
 @Composable
-fun SearchContent(modifier:Modifier = Modifier) {
+fun SearchContent(
+    state: Map<String, SearchUiStateComponent>,
+    modifier:Modifier = Modifier
+) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
@@ -115,26 +144,46 @@ fun SearchContent(modifier:Modifier = Modifier) {
             .fillMaxSize()
             .then(modifier)
     ) {
-        items(10) {
-            FoundItem()
+        if (state.isNotEmpty()) {
+            items(state.keys.toList()) {id ->
+                FoundItem(
+                    externalId = id,
+                    headlineText = state[id]!!.title,
+                    supportingText = state[id]!!.genres,
+                    trailingText = state[id]!!.score,
+                    image = state[id]!!.poster
+                )
+            }
         }
     }
 }
 
 @Composable
 fun FoundItem(
+    externalId: String,
     modifier: Modifier=Modifier,
     headlineText: String="Some Film Title",
-    supportingText: String="Some genres",
-    trailingText: String="Some Score",
+    supportingText: String?="Some genres",
+    trailingText: String?="Some Score",
     image: ImageBitmap?=null,
 ) {
     ListItem(
         headlineContent = { Text(text = headlineText)},
-        supportingContent = { Text(text = supportingText)},
-        trailingContent = { Text(text = trailingText) },
+        supportingContent = {
+            if (supportingText != null) {
+                Text(text = supportingText)
+            } else {
+                Text(text = "", modifier = Modifier.background(Color.LightGray))
+            }
+        },
+        trailingContent = {
+            if (trailingText != null) {
+                Text(text = trailingText)
+            } else {
+                Text(text = "", modifier = Modifier.background(Color.LightGray))
+            }
+        },
         colors = ListItemDefaults.colors(containerColor = Color(0xFFE2E2E9)), // more - 0xFFE2E2E9, 0xFFE7E8EE
-
         leadingContent = {
             if (image != null)
                 Image(
@@ -159,27 +208,4 @@ fun FoundItem(
             .then(modifier)
             .clip(RoundedCornerShape(12.dp))
     )
-}
-
-
-@Preview
-@Composable
-fun TwoLineListItem() {
-    Column {
-        ListItem(
-            headlineContent = { Text("Two line list item with trailing") },
-            supportingContent = { Text("Secondary text") },
-            trailingContent = { Text("meta") },
-            leadingContent = {
-                Icon(
-                    Icons.Filled.Favorite,
-                    contentDescription = "Localized description",
-                )
-            },
-            colors =  ListItemDefaults.colors(containerColor = Color.LightGray),
-            modifier = Modifier
-                .padding(horizontal = 8.dp, vertical = 8.dp)
-                .clip(RoundedCornerShape(12.dp))
-        )
-    }
 }

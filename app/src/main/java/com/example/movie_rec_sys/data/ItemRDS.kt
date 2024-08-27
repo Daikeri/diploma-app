@@ -1,5 +1,6 @@
 package com.example.movie_rec_sys.data
 
+import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.graphics.drawable.toBitmap
@@ -39,7 +40,9 @@ class ItemRemoteDataSource(
     }
 
     suspend fun getItem(id: String): Movie {
-        return sharedItems.getOrPut(id) { downloadItem(id) }
+        val result = sharedItems.getOrPut(id) { downloadItem(id) }
+        Log.e("${result.title}|${result.downloadImage}", "")
+        return result
     }
 
     private suspend fun downloadImage(url: String): ImageBitmap? {
@@ -56,6 +59,7 @@ class ItemRemoteDataSource(
         return if (result is SuccessResult) {
             val drawable = result.drawable
             drawable.toBitmap().asImageBitmap()
+
         } else {
             null
         }

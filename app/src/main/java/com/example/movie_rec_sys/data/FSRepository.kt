@@ -10,8 +10,6 @@ class FSRepository(
     private val dataSource: ItemRemoteDataSource,
     private val firestoreRS: FirestoreRemoteSource
 ) {
-    private val sharedItems: MutableMap<String, Movie> = mutableMapOf()
-
     private val recommendationsStruct: MutableMap<String,
             MutableMap<String, Pair<RecommendationDoc, Movie?>>> = mutableMapOf()
 
