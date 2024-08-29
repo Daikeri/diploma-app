@@ -3,6 +3,7 @@ package com.example.movie_rec_sys.uitemplate.authorization
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -62,8 +63,10 @@ fun GenderScreen(
 
     var dynamicHeight = if (choose) 260.dp else 190.dp
 
+    val customEasing = CubicBezierEasing(0.2f, 0f, 0f, 1f)
+
     val animateHeight by animateDpAsState(
-        animationSpec = tween(500, easing = customEasing),
+        animationSpec = tween(if (choose) 500 else 250, easing = customEasing, delayMillis = if (choose) 0 else 120),
         targetValue = dynamicHeight,
         label = "")
 
@@ -132,7 +135,7 @@ fun GenderScreen(
 
                 Crossfade(
                     targetState = choose,
-                    animationSpec = tween(easing = FastOutSlowInEasing, durationMillis = 20, delayMillis = 5),
+                    animationSpec = tween(easing = customEasing, durationMillis = if (choose) 300 else 120, delayMillis = if (choose) 200 else 0),
                     label = "",
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -175,8 +178,10 @@ fun AgeGroupScreen(
 
     var dynamicHeight = if (choose) 260.dp else 190.dp
 
+    val customEasing = CubicBezierEasing(0.2f, 0f, 0f, 1f)
+
     val animateHeight by animateDpAsState(
-        animationSpec = tween(500, easing = customEasing),
+        animationSpec = tween(300, easing = customEasing),
         targetValue = dynamicHeight,
         label = "")
 
@@ -255,7 +260,7 @@ fun AgeGroupScreen(
 
               Crossfade(
                   targetState = choose,
-                  animationSpec = tween(easing = FastOutSlowInEasing, durationMillis = 20, delayMillis = 5),
+                  animationSpec = tween(easing = customEasing, durationMillis = 20, delayMillis = 450),
                   label = "",
                   modifier = Modifier
                       .align(Alignment.BottomCenter)
@@ -335,30 +340,4 @@ fun CardWithIcon(
             )
         }
     }
-}
-
-
-val customEasing = Easing { fraction ->
-    // Функция вычисления кривой по аналогии с PathInterpolator
-    when {
-        fraction < 0.166666f -> {
-            // Первая кривая
-            val t = fraction / 0.166666f
-            cubicBezier(t, 0.05f, 0f, 0.133333f, 0.06f, 0.166666f, 0.4f)
-        }
-        else -> {
-            // Вторая кривая
-            val t = (fraction - 0.166666f) / (1f - 0.166666f)
-            cubicBezier(t, 0.208333f, 0.82f, 0.25f, 1f, 1f, 1f)
-        }
-    }
-}
-
-// Вспомогательная функция для вычисления значений на кривой Безье
-fun cubicBezier(t: Float, p0: Float, p1: Float, p2: Float, p3: Float, p4: Float, p5: Float): Float {
-    val u = 1f - t
-    return u * u * u * p0 +
-            3f * u * u * t * p1 +
-            3f * u * t * t * p2 +
-            t * t * t * p3
 }
