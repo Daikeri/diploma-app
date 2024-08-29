@@ -34,11 +34,13 @@ data class MovieFromDB(
 @Dao
 interface MoviesDao {
     @Query("""
-        SELECT movies.id, movies.title, movies.genres, links.external_id
-        FROM movies
-        INNER JOIN links ON movies.id = links.movie_id
-        WHERE LOWER(movies.title) LIKE LOWER(:query) || '%'
-    """)
+    SELECT movies.id, movies.title, movies.genres, links.external_id
+    FROM movies
+    INNER JOIN links ON movies.id = links.movie_id
+    WHERE :query IS NOT NULL AND :query <> '' 
+      AND LOWER(movies.title) LIKE LOWER(:query) || '%'
+""")
+
     fun findMovieByTitle(query: String): List<MovieFromDB>
 }
 

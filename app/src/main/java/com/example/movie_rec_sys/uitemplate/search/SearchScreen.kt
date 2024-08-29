@@ -190,7 +190,8 @@ fun FoundItem(
                     bitmap = image,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(64.dp)
+                        .height(64.dp)
+                        .width(48.dp)
                         .clip(RoundedCornerShape(12.dp))
                 )
             else

@@ -1,5 +1,6 @@
 package com.example.movie_rec_sys.viewmodel
 
+import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -13,7 +14,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
+import kotlin.coroutines.cancellation.CancellationException
 
 class SearchViewModel(
     private val dbRepository: DBRepository,
@@ -26,25 +30,35 @@ class SearchViewModel(
 
     suspend fun findMovieByTitle(title: String) {
         prevRequest?.cancel()
+
+        Log.e("QUERY TO DB", title)
+
         prevRequest = viewModelScope.launch {
-            dbRepository.findMovieByTitle(title).collect { searchStruct ->
-                _uiState.value = searchStruct.mapValues { entry ->
-                    val state =
-                        if (entry.value.second == null) {
-                            SearchUiStateComponent(
-                                title = entry.value.first.title,
-                                genres = entry.value.first.genres,
-                            )
-                        } else {
-                            SearchUiStateComponent(
-                                title = entry.value.first.title,
-                                genres = entry.value.first.genres,
-                                score = entry.value.second!!.rated,
-                                poster = entry.value.second!!.downloadImage
-                            )
-                        }
-                    state
+            try {
+                yield()
+                dbRepository.findMovieByTitle(title).collect { searchStruct ->
+                    yield()
+                    _uiState.value = searchStruct.mapValues { entry ->
+                        yield()
+                        val state =
+                            if (entry.value.second == null) {
+                                SearchUiStateComponent(
+                                    title = entry.value.first.title,
+                                    genres = entry.value.first.genres,
+                                )
+                            } else {
+                                SearchUiStateComponent(
+                                    title = entry.value.first.title,
+                                    genres = entry.value.first.genres,
+                                    score = entry.value.second!!.imdbRating,
+                                    poster = entry.value.second!!.downloadImage
+                                )
+                            }
+                        state
+                    }
                 }
+            } catch (e: CancellationException) {
+               Log.e("CANSEL COROUTINE", "")
             }
         }
     }
