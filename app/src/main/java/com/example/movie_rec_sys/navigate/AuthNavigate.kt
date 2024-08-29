@@ -30,8 +30,6 @@ fun Navigate(
         false -> "general screen"
     }
 
-    Log.e("OWNER VM IN NAV GRAPH", "${LocalViewModelStoreOwner.current?.javaClass}\n${LocalViewModelStoreOwner.current.hashCode()}")
-
     NavHost(
         navController = navController,
         startDestination = startDestination

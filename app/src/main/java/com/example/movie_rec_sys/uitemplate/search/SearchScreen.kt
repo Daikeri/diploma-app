@@ -1,5 +1,6 @@
 package com.example.movie_rec_sys.uitemplate.search
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing
@@ -37,6 +38,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -89,6 +91,11 @@ fun MySearchBar(
 ) {
     var inputQuery by remember { mutableStateOf("") }
     var isActive by remember { mutableStateOf(false) }
+    var searchContentState by remember { mutableStateOf(state) }
+
+    LaunchedEffect(key1 = state) {
+        searchContentState = state
+    }
 
     SearchBar(
         query = inputQuery,
@@ -98,14 +105,24 @@ fun MySearchBar(
         },
         onSearch = { isActive = !isActive },
         active = isActive,
-        onActiveChange = { isActive = !isActive },
-        leadingIcon = { LeadingIcon(isActive) { isActive = !isActive }  },
+        onActiveChange = {
+            isActive = it
+            inputQuery = ""
+            searchContentState = mapOf()
+        },
+        leadingIcon = {
+            LeadingIcon(isActive) {
+                isActive = !isActive
+                inputQuery = ""
+                searchContentState = mapOf()
+            }
+        },
         placeholder = { Text(text = "Давайте чета поищем...") },
         colors = SearchBarDefaults.colors(containerColor = Color(0xFFEDEDF4)),
         modifier = Modifier
             .then(modifier)
     ) {
-        SearchContent(state)
+        SearchContent(searchContentState)
     }
 }
 @Composable
@@ -113,7 +130,7 @@ fun LeadingIcon(isActive: Boolean, change: () -> Unit)  {
     AnimatedContent(
         targetState = isActive,
         label = "",
-        transitionSpec = { fadeIn().togetherWith(fadeOut()) }
+        transitionSpec = { fadeIn() togetherWith fadeOut() }
     ) {
         if (it) {
             IconButton(onClick = change) {

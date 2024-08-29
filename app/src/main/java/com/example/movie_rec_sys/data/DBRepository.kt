@@ -30,6 +30,5 @@ class DBRepository(
             emit(searchStruct)
         }
 
-        Log.e("SEARCH EMIT", "query=${title}|$searchStruct")
     }.flowOn(Dispatchers.IO)
 }

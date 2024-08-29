@@ -58,7 +58,6 @@ fun GenderScreen(
     viewModel: AuthViewModel = viewModel(),
     toNextScreen: () -> Unit
 )  {
-    Log.e("viewModel", "${viewModel.hashCode()}")
     var choose by remember { mutableStateOf(false) }
 
     var dynamicHeight = if (choose) 260.dp else 190.dp
@@ -172,7 +171,6 @@ fun AgeGroupScreen(
     viewModel: AuthViewModel = viewModel(),
     toNextScreen: () -> Unit
 ) {
-    Log.e("viewModel", "${viewModel.hashCode()}")
     var choose by remember { mutableStateOf(false) }
 
     var dynamicHeight = if (choose) 260.dp else 190.dp

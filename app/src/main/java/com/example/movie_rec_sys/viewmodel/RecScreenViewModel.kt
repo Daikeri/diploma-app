@@ -34,7 +34,6 @@ class RecScreenViewModel(
     init {
         viewModelScope.launch {
             itemRepos.recScreenData.collect { uiStruct ->
-                Log.e("emit new state from ItemRepository", "")
                 val lastElement = (10 - 1) * 250
                 val uiContent = uiStruct.mapValues { category ->
                     var indexesCount = 0

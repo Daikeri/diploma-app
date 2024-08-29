@@ -41,7 +41,6 @@ class ItemRemoteDataSource(
 
     suspend fun getItem(id: String): Movie {
         val result = sharedItems.getOrPut(id) { downloadItem(id) }
-        Log.e("${result.title}|${result.downloadImage}", "")
         return result
     }
 

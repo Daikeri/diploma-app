@@ -31,34 +31,28 @@ class SearchViewModel(
     suspend fun findMovieByTitle(title: String) {
         prevRequest?.cancel()
 
-        Log.e("QUERY TO DB", title)
-
         prevRequest = viewModelScope.launch {
-            try {
+            yield()
+            dbRepository.findMovieByTitle(title).collect { searchStruct ->
                 yield()
-                dbRepository.findMovieByTitle(title).collect { searchStruct ->
+                _uiState.value = searchStruct.mapValues { entry ->
                     yield()
-                    _uiState.value = searchStruct.mapValues { entry ->
-                        yield()
-                        val state =
-                            if (entry.value.second == null) {
-                                SearchUiStateComponent(
-                                    title = entry.value.first.title,
-                                    genres = entry.value.first.genres,
-                                )
-                            } else {
-                                SearchUiStateComponent(
-                                    title = entry.value.first.title,
-                                    genres = entry.value.first.genres,
-                                    score = entry.value.second!!.imdbRating,
-                                    poster = entry.value.second!!.downloadImage
-                                )
-                            }
-                        state
-                    }
+                    val state =
+                        if (entry.value.second == null) {
+                            SearchUiStateComponent(
+                                title = entry.value.first.title,
+                                genres = entry.value.first.genres,
+                            )
+                        } else {
+                            SearchUiStateComponent(
+                                title = entry.value.first.title,
+                                genres = entry.value.first.genres,
+                                score = entry.value.second!!.imdbRating,
+                                poster = entry.value.second!!.downloadImage
+                            )
+                        }
+                    state
                 }
-            } catch (e: CancellationException) {
-               Log.e("CANSEL COROUTINE", "")
             }
         }
     }
