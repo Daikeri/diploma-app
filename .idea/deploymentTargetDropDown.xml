@@ -2,15 +2,6 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="MyDialog">
-        <State />
-      </entry>
-      <entry key="SearchScreen">
-        <State />
-      </entry>
-      <entry key="UserCollectionScreen">
-        <State />
-      </entry>
       <entry key="app">
         <State>
           <runningDeviceTargetSelectedWithDropDown>
@@ -26,6 +17,12 @@
           </runningDeviceTargetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-08-23T21:46:05.850516Z" />
         </State>
+      </entry>
+      <entry key="feature">
+        <State />
+      </entry>
+      <entry key="feature.favorite">
+        <State />
       </entry>
     </value>
   </component>

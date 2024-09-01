@@ -1,6 +1,7 @@
 package com.example.movie_rec_sys.navigate
 
 import android.util.Log
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
