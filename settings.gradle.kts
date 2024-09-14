@@ -23,3 +23,4 @@ rootProject.name = "movie-rec-sys"
 include(":app")
 include(":feature")
 include(":feature:favorite")
+include(":feature:authorization")

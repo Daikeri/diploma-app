@@ -120,9 +120,9 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
 
-@Preview
+
 @Composable
-fun CardDetailScreen() {
+fun CardDetailScreen(widthState: Dp, heightState:Dp, onClickBackButton: () -> Unit) {
     val listState = rememberLazyListState()
 
     var isDescriptionExpand by remember {
@@ -152,12 +152,17 @@ fun CardDetailScreen() {
 
     LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
+            //.fillMaxSize()
+            .width(widthState)
+            .height(heightState)
             .padding(horizontal = 10.dp),
         state = listState
     ) {
         item {
-            MoviePoster(Modifier.padding(bottom = 8.dp))
+            MoviePoster(
+                onClickBackButton,
+                Modifier.padding(bottom = 8.dp),
+            )
         }
         
         item {
@@ -184,6 +189,7 @@ fun CardDetailScreen() {
 
 @Composable
 fun MoviePoster(
+    onClickBackButton: () -> Unit,
     modifier: Modifier = Modifier,
     image: ImageBitmap? = null
 ) {
@@ -226,7 +232,7 @@ fun MoviePoster(
             )
 
             IconButton(
-                onClick = { /*TODO*/ },
+                onClick = { onClickBackButton() },
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(top = 4.dp, start = 4.dp)

@@ -2,7 +2,19 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="PreviewExpandableTextExample">
+      <entry key="InputFieldSurface">
+        <State />
+      </entry>
+      <entry key="InputFormScreen">
+        <State />
+      </entry>
+      <entry key="InputFormScreen (1)">
+        <State />
+      </entry>
+      <entry key="SelectionScreen">
+        <State />
+      </entry>
+      <entry key="SelectionScreen (1)">
         <State />
       </entry>
       <entry key="app">
@@ -22,6 +34,9 @@
         </State>
       </entry>
       <entry key="feature">
+        <State />
+      </entry>
+      <entry key="feature.authorization">
         <State />
       </entry>
       <entry key="feature.favorite">
