@@ -1,6 +1,5 @@
 package com.example.movie_rec_sys.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -11,13 +10,13 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.movie_rec_sys.MyApplication
 import com.example.movie_rec_sys.data.AuthResult
 import com.example.movie_rec_sys.data.FirebaseAuthRepository
-import com.example.movie_rec_sys.data.FirestoreRepository
+import com.example.movie_rec_sys.data.FirestoreRemoteSource
 import kotlinx.coroutines.launch
 
 
 class AuthViewModel(
     private val firebaseRepos: FirebaseAuthRepository,
-    private val firestoreRepos: FirestoreRepository,
+    private val firestoreRepos: FirestoreRemoteSource,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
     private val _uiState = MutableLiveData<AuthResult>()

@@ -16,12 +16,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppTheme {
-                Surface(
-                    color = MaterialTheme.colorScheme.surface,
-                ) {
-                    Navigate(application as MyApplication)
-                }
+            Surface(
+                color = MaterialTheme.colorScheme.surface,
+            ) {
+                Navigate(application as MyApplication)
             }
         }
     }

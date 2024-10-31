@@ -1,6 +1,5 @@
 package com.example.movie_rec_sys.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -8,15 +7,15 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.movie_rec_sys.MyApplication
-import com.example.movie_rec_sys.data.FirestoreRepository
-import com.example.movie_rec_sys.data.ItemRepository
+import com.example.movie_rec_sys.data.FirestoreRemoteSource
+import com.example.movie_rec_sys.data.FSRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class UserCollectionViewModel(
-    private val itemRepos: ItemRepository,
-    private val firestoreRepos: FirestoreRepository,
+    private val itemRepos: FSRepository,
+    private val firestoreRepos: FirestoreRemoteSource,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
@@ -26,14 +25,7 @@ class UserCollectionViewModel(
     init {
         viewModelScope.launch {
             firestoreRepos.usersCollection.collect { updates ->
-                Log.e("${updates.size}", "")
-                updates.forEach { (actionFlag, docId, docContent) ->
-                    when(actionFlag) {
-                        "ADDED" -> {}
-                        "MODIFIED" -> {}
-                        "REMOVED" -> {}
-                    }
-                }
+
             }
         }
     }

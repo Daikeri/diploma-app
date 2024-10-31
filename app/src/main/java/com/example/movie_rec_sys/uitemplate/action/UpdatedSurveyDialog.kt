@@ -75,10 +75,6 @@ fun UpdatedSurveyDialog(
                 .height(400.dp)
                 .width(320.dp)
                 .onGloballyPositioned {
-                    Log.e(
-                        "size",
-                        "${with(density) { it.size.height.toDp() }}|${with(density) { it.size.width.toDp() }}"
-                    )
                 }
         ) {
             if (!uiState.isLoading) {

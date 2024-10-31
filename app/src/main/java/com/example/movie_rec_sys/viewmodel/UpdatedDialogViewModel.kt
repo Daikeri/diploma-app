@@ -1,6 +1,5 @@
 package com.example.movie_rec_sys.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -10,19 +9,17 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.movie_rec_sys.MyApplication
-import com.example.movie_rec_sys.data.FirestoreRepository
+import com.example.movie_rec_sys.data.FirestoreRemoteSource
 import com.example.movie_rec_sys.data.GenresData
-import com.example.movie_rec_sys.data.ItemRepository
+import com.example.movie_rec_sys.data.FSRepository
 import com.example.movie_rec_sys.data.Movie
 import com.example.movie_rec_sys.data.PrimaryRecRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class UpdatedDialogViewModel(
     private val primaryRepos: PrimaryRecRepository,
-    private val itemRepos: ItemRepository,
-    private val firestoreRepos: FirestoreRepository,
+    private val itemRepos: FSRepository,
+    private val firestoreRepos: FirestoreRemoteSource,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
@@ -38,16 +35,20 @@ class UpdatedDialogViewModel(
 
     private fun startDownload() {
         viewModelScope.launch {
+
+            /*
             firestoreRepos.recommendation.collect { docUpdates ->
                 if (docUpdates.isNotEmpty()) {
                     withContext(Dispatchers.IO) {
                         docUpdates.forEach { doc ->
-                            itemRepos.getUserItem(doc["source_item_id"].toString())
+                            itemRepos.withoutCash(doc["source_item_id"].toString())
                         }
                     }
                     _recommendationDownload.value = true
                 }
             }
+
+             */
         }
     }
 

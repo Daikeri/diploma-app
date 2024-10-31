@@ -3,6 +3,8 @@ package com.example.movie_rec_sys.uitemplate.authorization
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -57,12 +59,16 @@ fun GenderScreen(
     viewModel: AuthViewModel = viewModel(),
     toNextScreen: () -> Unit
 )  {
-    Log.e("viewModel", "${viewModel.hashCode()}")
     var choose by remember { mutableStateOf(false) }
 
     var dynamicHeight = if (choose) 260.dp else 190.dp
 
-    val animateHeight by animateDpAsState(targetValue = dynamicHeight, label = "")
+    val customEasing = CubicBezierEasing(0.2f, 0f, 0f, 1f)
+
+    val animateHeight by animateDpAsState(
+        animationSpec = tween(if (choose) 500 else 250, easing = customEasing, delayMillis = if (choose) 0 else 120),
+        targetValue = dynamicHeight,
+        label = "")
 
     Column(
         modifier = Modifier
@@ -129,7 +135,7 @@ fun GenderScreen(
 
                 Crossfade(
                     targetState = choose,
-                    animationSpec = tween(easing = FastOutSlowInEasing, durationMillis = 20, delayMillis = 5),
+                    animationSpec = tween(easing = customEasing, durationMillis = if (choose) 300 else 120, delayMillis = if (choose) 200 else 0),
                     label = "",
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -168,12 +174,16 @@ fun AgeGroupScreen(
     viewModel: AuthViewModel = viewModel(),
     toNextScreen: () -> Unit
 ) {
-    Log.e("viewModel", "${viewModel.hashCode()}")
     var choose by remember { mutableStateOf(false) }
 
     var dynamicHeight = if (choose) 260.dp else 190.dp
 
-    val animateHeight by animateDpAsState(targetValue = dynamicHeight, label = "")
+    val customEasing = CubicBezierEasing(0.2f, 0f, 0f, 1f)
+
+    val animateHeight by animateDpAsState(
+        animationSpec = tween(300, easing = customEasing),
+        targetValue = dynamicHeight,
+        label = "")
 
     Column(
         modifier = Modifier
@@ -250,7 +260,7 @@ fun AgeGroupScreen(
 
               Crossfade(
                   targetState = choose,
-                  animationSpec = tween(easing = FastOutSlowInEasing, durationMillis = 20, delayMillis = 5),
+                  animationSpec = tween(easing = customEasing, durationMillis = 20, delayMillis = 450),
                   label = "",
                   modifier = Modifier
                       .align(Alignment.BottomCenter)
