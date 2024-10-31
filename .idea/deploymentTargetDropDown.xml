@@ -2,36 +2,23 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="InputFieldSurface">
-        <State />
-      </entry>
       <entry key="InputFormScreen">
-        <State />
-      </entry>
-      <entry key="InputFormScreen (1)">
         <State />
       </entry>
       <entry key="SelectionScreen">
         <State />
       </entry>
-      <entry key="SelectionScreen (1)">
+      <entry key="app">
         <State />
       </entry>
-      <entry key="app">
-        <State>
-          <runningDeviceTargetSelectedWithDropDown>
-            <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="SERIAL_NUMBER" />
-                  <value value="36071FDH20056X" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-08-23T21:46:05.850516Z" />
-        </State>
+      <entry key="app.test">
+        <State />
+      </entry>
+      <entry key="core">
+        <State />
+      </entry>
+      <entry key="data">
+        <State />
       </entry>
       <entry key="feature">
         <State />

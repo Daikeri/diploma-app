@@ -57,7 +57,9 @@ import com.example.authorization.R
 
 @Preview
 @Composable
-fun InputFormScreen() {
+fun InputFormScreen(
+
+) {
     val snackBarState = remember { SnackbarHostState() }
 
     Box(modifier = Modifier.fillMaxSize()) {
