@@ -29,13 +29,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.auth.R
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Preview
 @Composable
 fun SelectionScreen(
-    onClickLogIn: () -> Unit = {},
-    onClickSignUp: () -> Unit = {}
+    onAuthButtonClick: (Boolean) -> Unit = {}
 ) {
     Surface(
         color = Color.White,
@@ -56,7 +54,10 @@ fun SelectionScreen(
             // Приветственная надпись
             BackgroundTitle(modifier = Modifier.align(Alignment.TopStart))
 
-            AuthSurface(modifier = Modifier.align(Alignment.Center))
+            AuthSurface(
+                modifier = Modifier.align(Alignment.Center),
+                onAuthButtonClick = onAuthButtonClick
+            )
         }
     }
 }
@@ -92,7 +93,10 @@ fun BackgroundTitle(
 }
 
 @Composable
-fun AuthSurface(modifier: Modifier) {
+fun AuthSurface(
+    modifier: Modifier,
+    onAuthButtonClick: (Boolean) -> Unit
+) {
     val paddingX = 60.dp
     Surface(
         color = Color.White,
@@ -138,12 +142,14 @@ fun AuthSurface(modifier: Modifier) {
             ) {
                 AuthSurfaceButton(
                     modifier =  Modifier.padding(bottom = 16.dp),
-                    text = "Log in"
+                    text = "Log in",
+                    onButtonClick = { onAuthButtonClick(true) }
                 )
 
                 AuthSurfaceButton(
                     modifier = modifier,
-                    text = "Sign Up"
+                    text = "Sign Up",
+                    onButtonClick = { onAuthButtonClick(false) }
                 )
             }
         }
@@ -153,10 +159,11 @@ fun AuthSurface(modifier: Modifier) {
 @Composable
 fun AuthSurfaceButton(
     modifier: Modifier,
-    text: String
+    text: String,
+    onButtonClick: () -> Unit
 ) {
     Button(
-        onClick = {},
+        onClick = { onButtonClick() },
         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
         elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 6.dp),
         modifier = Modifier

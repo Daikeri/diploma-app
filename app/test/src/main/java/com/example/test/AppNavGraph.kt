@@ -7,12 +7,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.auth.ui.InputFormScreen
+import com.example.auth.ui.SelectionScreen
 import kotlinx.serialization.Serializable
 
 
 @Serializable object SelectionAuth
-@Serializable object InputForm
+@Serializable
+data class InputForm(val hasRegisteredBefore: Boolean)
 @Serializable object ChooseGender
 @Serializable object ChooseAge
 @Serializable object BottomNavigate
@@ -30,13 +33,18 @@ fun ApplicationNavigationGraph(userLoggedIn: Boolean) {
         startDestination = if (userLoggedIn) BottomNavigate else SelectionAuth
     ) {
         composable<SelectionAuth> {
-            InputFormScreen {
-
-            }
+          SelectionScreen { authState ->
+              navController.navigate(InputForm(authState))
+          }
         }
 
         composable<InputForm> {
-
+            val passArg = it.toRoute<InputForm>()
+            InputFormScreen(
+                hasRegisteredBefore = passArg.hasRegisteredBefore
+            ) {
+                navController.navigate(RecFeed)
+            }
         }
 
         composable<ChooseGender> {

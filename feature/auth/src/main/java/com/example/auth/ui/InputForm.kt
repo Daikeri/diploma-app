@@ -56,6 +56,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun InputFormScreen(
+    hasRegisteredBefore: Boolean,
     viewModel: AuthViewModel = hiltViewModel(),
     onTransitionButtonClick: () -> Unit
 ) {
@@ -94,7 +95,10 @@ fun InputFormScreen(
                 .padding(bottom = 195.dp)
         ) { email: String, password: String ->
             screenScope.launch {
-                viewModel.authExistUser(email, password)
+                if (hasRegisteredBefore)
+                    viewModel.authExistUser(email, password)
+                else
+                    viewModel.createUser(email, password)
             }
         }
     }
