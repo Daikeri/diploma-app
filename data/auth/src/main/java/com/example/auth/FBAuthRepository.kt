@@ -49,7 +49,7 @@ class FBAuthRepository @Inject constructor(
         }
     }
 
-    suspend fun createUser(email: String, password: String) {
+    suspend fun createUser(email: String, password: String): AuthState {
         return withContext(Dispatchers.IO) {
             try {
                 val networkRequest = firebaseAuthDataSource.firebaseAuthInstance
@@ -64,7 +64,7 @@ class FBAuthRepository @Inject constructor(
         }
     }
 
-    suspend fun authExistUser(email: String, password: String) {
+    suspend fun authExistUser(email: String, password: String): AuthState {
         return withContext(Dispatchers.IO) {
             try {
                 val networkRequest = firebaseAuthDataSource.firebaseAuthInstance
@@ -91,6 +91,6 @@ enum class AuthState {
     TooManyRequests,
     UserDoesNotExist,
     IncorrectEmailOrPassword,
-    Success
+    Success,
 }
 

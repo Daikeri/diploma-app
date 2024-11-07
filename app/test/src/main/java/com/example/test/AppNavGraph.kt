@@ -2,10 +2,12 @@ package com.example.test
 
 import android.app.Application
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.example.auth.ui.InputFormScreen
 import kotlinx.serialization.Serializable
 
 
@@ -28,7 +30,9 @@ fun ApplicationNavigationGraph(userLoggedIn: Boolean) {
         startDestination = if (userLoggedIn) BottomNavigate else SelectionAuth
     ) {
         composable<SelectionAuth> {
+            InputFormScreen {
 
+            }
         }
 
         composable<InputForm> {
@@ -44,6 +48,7 @@ fun ApplicationNavigationGraph(userLoggedIn: Boolean) {
         }
 
         navigation<BottomNavigate>(startDestination = RecFeed) {
+            composable<RecFeed> {  }
             composable<PersonalList> {  }
             composable<Search> {  }
             composable<Profile> {  }

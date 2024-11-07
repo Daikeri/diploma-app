@@ -40,13 +40,11 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            MovierecsysTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    ApplicationNavigationGraph(userLoggedState)
-                }
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                ApplicationNavigationGraph(userLoggedState)
             }
         }
     }

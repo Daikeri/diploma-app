@@ -1,26 +1,21 @@
 package com.example.auth.ui
-
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.CubicBezierEasing
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -33,41 +28,53 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.auth.R
+import com.example.auth.viewmodel.AuthViewModel
+import kotlinx.coroutines.launch
 
-@Preview
+
 @Composable
 fun InputFormScreen(
-
+    viewModel: AuthViewModel = hiltViewModel(),
+    onTransitionButtonClick: () -> Unit
 ) {
+    val uiState = viewModel.uiState.observeAsState()
     val snackBarState = remember { SnackbarHostState() }
+    val screenScope = rememberCoroutineScope()
+    Log.e("From Compose", "${uiState.value?.isSuccessful}")
+
+    LaunchedEffect(key1 = uiState.value) {
+
+        uiState.value?.let {
+            if (it.isSuccessful) {
+                onTransitionButtonClick()
+            } else
+                snackBarState.showSnackbar(it.errorMessage!!)
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        CustomSnackBar(
-            snackBarState = snackBarState,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
-
         Image(
             imageVector = ImageVector.vectorResource(R.drawable.blurry_background_meta),
             contentDescription = null,
@@ -76,11 +83,20 @@ fun InputFormScreen(
                 .blur(50.dp)
         )
 
+        CustomSnackBar(
+            snackBarState = snackBarState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
+
         InputFieldSurface(
             Modifier
                 .align(Alignment.Center)
                 .padding(bottom = 195.dp)
-        )
+        ) { email: String, password: String ->
+            screenScope.launch {
+                viewModel.authExistUser(email, password)
+            }
+        }
     }
 }
 
@@ -93,20 +109,32 @@ fun CustomSnackBar(
         hostState = snackBarState,
         modifier = Modifier.then(modifier)
     ) {
-        Snackbar {
+        Snackbar(
+            actionOnNewLine = true,
+            containerColor = Color(0xFF93000A),
+            contentColor = Color(0xFFFFDAD6),
+            modifier = Modifier
+                .padding(8.dp)
+                .clip(RoundedCornerShape(12.dp))
+        ) {
             snackBarState.currentSnackbarData?.visuals?.let { it1 ->
                 Text(
+                    modifier  = modifier.fillMaxWidth(),
                     text = it1.message,
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
+                    textAlign = TextAlign.Justify
                 )
             }
         }
     }
 }
 
-@Preview
+
 @Composable
-fun InputFieldSurface(modifier: Modifier = Modifier) {
+fun InputFieldSurface(
+    modifier: Modifier = Modifier,
+    onButtonClick: (String, String) -> Unit
+) {
     val emailState = rememberInputFieldState()
     val passwordState = rememberInputFieldState()
 
@@ -174,7 +202,9 @@ fun InputFieldSurface(modifier: Modifier = Modifier) {
                 onValueChange = onInputChange
             )
 
-            TransitionButton(isVisible = buttonLockState)
+            TransitionButton(isVisible = buttonLockState, onButtonClick = {
+                onButtonClick(emailState.textValue, passwordState.textValue)
+            })
         }
     }
 }
@@ -223,7 +253,10 @@ class InputFieldState {
 fun rememberInputFieldState() = remember { InputFieldState() }
 
 @Composable
-fun TransitionButton(isVisible: Boolean) {
+fun TransitionButton(
+    isVisible: Boolean,
+    onButtonClick: () -> Unit
+) {
     AnimatedVisibility(visible = isVisible, modifier = Modifier.fillMaxWidth()) {
         Button(
             shape = RoundedCornerShape(
@@ -237,7 +270,7 @@ fun TransitionButton(isVisible: Boolean) {
                 .height(50.dp)
                 .fillMaxWidth()
                 .background(Color.Red),
-            onClick = { /*TODO*/ },
+            onClick = { onButtonClick() },
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.ArrowForward, contentDescription = null)
         }
