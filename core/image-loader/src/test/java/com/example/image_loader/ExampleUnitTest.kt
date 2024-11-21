@@ -1,4 +1,4 @@
-package com.example.image_downloader
+package com.example.image_loader
 
 import org.junit.Test
 

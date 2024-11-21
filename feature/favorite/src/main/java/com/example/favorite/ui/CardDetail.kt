@@ -120,9 +120,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
 
-
 @Composable
-fun CardDetailScreen(widthState: Dp, heightState:Dp, onClickBackButton: () -> Unit) {
+fun CardDetailScreen(widthState: Dp, heightState:Dp, onClickBackButton: () -> Unit = {}) {
     val listState = rememberLazyListState()
 
     var isDescriptionExpand by remember {
