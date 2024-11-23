@@ -90,12 +90,14 @@ fun Temp3() {
         Surface(
             shadowElevation = 4.dp,
             shape = RoundedCornerShape(12.dp),
-            color = Color.White
+            color = Color.White,
+            modifier = Modifier.alpha(0.0f)
         ) {
             Box(modifier = Modifier
                 .size(width = 240.dp, height = 120.dp)
                 .clickable { openCardDetail = !openCardDetail }
                 .zIndex(2f)
+
             ) {
 
             }

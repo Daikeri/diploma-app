@@ -28,7 +28,9 @@ class ImageLoader @Inject constructor(
 
         return if (result is SuccessResult) {
             val drawable = result.drawable
-            drawable.toBitmap().asImageBitmap()
+            drawable
+                .toBitmap()
+                .asImageBitmap()
         } else {
             null
         }

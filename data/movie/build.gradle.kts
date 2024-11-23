@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.network"
+    namespace = "com.example.movie"
     compileSdk = 34
 
     defaultConfig {
@@ -42,10 +42,14 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation(libs.androidx.compose.bom)
-
-    implementation(libs.coil.compose)
 
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui.graphics)
+
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(project(":core:network"))
+
 }
