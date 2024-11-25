@@ -52,3 +52,23 @@ data class RecommendationDoc(
     val rated: Int?,
     val relevanceIndex: Int,
 )
+
+/*
+
+data class RecommendationDocContent(
+    val category: String,
+    val itemId: String,
+    val marked: Boolean,
+    val viewed: Boolean,
+    val rated: Int?,
+    val relevanceIndex: Int,
+)
+
+data class RecommendationDoc(
+    val docID: String
+    val content: RecommendationDocContent
+    val actionFlag: String
+)
+
+
+ */

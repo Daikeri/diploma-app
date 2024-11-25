@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/feature/auth" />
             <option value="$PROJECT_DIR$/feature/authorization" />
             <option value="$PROJECT_DIR$/feature/favorite" />
+            <option value="$PROJECT_DIR$/feature/personal-feed" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />
