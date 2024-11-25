@@ -21,15 +21,11 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class FBAuthDataSource @Inject constructor(
-    val firebaseAuthInstance: FirebaseAuth
-)
-
 @Suppress("MemberVisibilityCanBePrivate")
 class FBAuthRepository @Inject constructor(
-    private val firebaseAuthDataSource: FBAuthDataSource
+    private val firebaseAuthDataSource: FirebaseAuth
 ) {
-    val userState = MutableStateFlow<FirebaseUser?>(firebaseAuthDataSource.firebaseAuthInstance.currentUser)
+    val userState = MutableStateFlow<FirebaseUser?>(firebaseAuthDataSource.currentUser)
 
     init {
         val innerFlow = callbackFlow {
@@ -37,9 +33,9 @@ class FBAuthRepository @Inject constructor(
                 trySend(auth.currentUser)
             }
 
-            firebaseAuthDataSource.firebaseAuthInstance.addAuthStateListener(authStateListener)
+            firebaseAuthDataSource.addAuthStateListener(authStateListener)
 
-            awaitClose {  firebaseAuthDataSource.firebaseAuthInstance.removeAuthStateListener(authStateListener) }
+            awaitClose {  firebaseAuthDataSource.removeAuthStateListener(authStateListener) }
         }.flowOn(Dispatchers.IO)
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -52,7 +48,7 @@ class FBAuthRepository @Inject constructor(
     suspend fun createUser(email: String, password: String): AuthState {
         return withContext(Dispatchers.IO) {
             try {
-                val networkRequest = firebaseAuthDataSource.firebaseAuthInstance
+                val networkRequest = firebaseAuthDataSource
                     .createUserWithEmailAndPassword(email, password)
                     .await()
                 AuthState.Success
@@ -67,7 +63,7 @@ class FBAuthRepository @Inject constructor(
     suspend fun authExistUser(email: String, password: String): AuthState {
         return withContext(Dispatchers.IO) {
             try {
-                val networkRequest = firebaseAuthDataSource.firebaseAuthInstance
+                val networkRequest = firebaseAuthDataSource
                     .signInWithEmailAndPassword(email, password)
                     .await()
                 AuthState.Success
