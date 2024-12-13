@@ -13,7 +13,7 @@ import javax.inject.Inject
 class FirestoreRepository @Inject constructor(
     private val firestoreRDS: FirebaseFirestore
 ) {
-    fun recommendation(firebaseUserID: String):Flow<List<Triple<String, String, RecommendationDoc>>>
+    fun recommendation(firebaseUserID: String): Flow<List<RecommendationDoc>>
     = callbackFlow {
         val request = firestoreRDS.collection("recommendation")
             .whereEqualTo("user_id", firebaseUserID)
@@ -26,7 +26,7 @@ class FirestoreRepository @Inject constructor(
                     val hash = it.document.data
                     val actionFlag = it.type.toString()
                     val docId = it.document.id
-                    val docContent = RecommendationDoc(
+                    val docContent = RecDocContent(
                         category = hash["category"] as String,
                         itemId = hash["source_item_id"] as String,
                         marked = hash["marked"] as Boolean,
@@ -34,7 +34,11 @@ class FirestoreRepository @Inject constructor(
                         rated = hash["rated"] as? Int,
                         relevanceIndex = (hash["relevance_index"] as Long).toInt(),
                     )
-                    Triple(actionFlag, docId, docContent)
+                    RecommendationDoc(
+                        actionFlag = actionFlag,
+                        docID = docId,
+                        content = docContent
+                    )
                 }
                 trySend(result)
             }
@@ -44,18 +48,8 @@ class FirestoreRepository @Inject constructor(
     }.flowOn(Dispatchers.IO)
 }
 
-data class RecommendationDoc(
-    val category: String,
-    val itemId: String,
-    val marked: Boolean,
-    val viewed: Boolean,
-    val rated: Int?,
-    val relevanceIndex: Int,
-)
 
-/*
-
-data class RecommendationDocContent(
+data class RecDocContent(
     val category: String,
     val itemId: String,
     val marked: Boolean,
@@ -65,10 +59,7 @@ data class RecommendationDocContent(
 )
 
 data class RecommendationDoc(
-    val docID: String
-    val content: RecommendationDocContent
-    val actionFlag: String
+    val actionFlag: String,
+    val docID: String,
+    val content: RecDocContent,
 )
-
-
- */
