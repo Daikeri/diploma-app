@@ -1,5 +1,6 @@
 package com.example.movie
 
+import android.util.Log
 import com.example.network.ImageLoader
 import com.google.gson.annotations.SerializedName
 import javax.inject.Inject
@@ -7,23 +8,27 @@ import androidx.compose.ui.graphics.ImageBitmap
 
 
 class MovieRepository @Inject constructor(
-    private val movieRDS: ODMbApiService,
-    private val imageLoader: ImageLoader,
-    val apiKey: String = ""
+    val movieRDS: ODMbApiService,
+    val imageLoader: ImageLoader,
 ) {
     private val cashedMovie: MutableMap<String, Movie> = mutableMapOf()
 
-    suspend fun getMovie(movieID: String): Movie {
-        return cashedMovie.getOrPut(movieID) { findOrDownloadMovie(movieID) }
+    suspend fun getMovie(movieID: String): Movie? {
+        return try {
+            cashedMovie.getOrPut(movieID) { findOrDownloadMovie(movieID) }
+        } catch (e: Exception) {
+            Log.e("Exception from MovieRepos", "$e")
+            null
+        }
     }
 
     private suspend fun findOrDownloadMovie(movieID:String): Movie {
         val movie = movieRDS.getMovieDetails(
-            apiKey = apiKey,
+            apiKey = "f75f8380",
             movieId = movieID
         )
 
-        val image = imageLoader.downloadImage(movieID)
+        val image = imageLoader.downloadImage(movie.poster)
         movie.downloadImage = image
         cashedMovie[movieID] = movie
         return movie

@@ -11,8 +11,10 @@ import javax.inject.Inject
 
 
 class FirestoreRepository @Inject constructor(
-    private val firestoreRDS: FirebaseFirestore
+    val firestoreRDS: FirebaseFirestore
 ) {
+    private val cashedDoc: MutableMap<String, RecDocContent> = mutableMapOf()
+
     fun recommendation(firebaseUserID: String): Flow<List<RecommendationDoc>>
     = callbackFlow {
         val request = firestoreRDS.collection("recommendation")
@@ -28,16 +30,20 @@ class FirestoreRepository @Inject constructor(
                     val docId = it.document.id
                     val docContent = RecDocContent(
                         category = hash["category"] as String,
-                        itemId = hash["source_item_id"] as String,
+                        downloadResID = hash["source_item_id"] as String,
                         marked = hash["marked"] as Boolean,
                         viewed = hash["viewed"] as Boolean,
                         rated = hash["rated"] as? Int,
                         relevanceIndex = (hash["relevance_index"] as Long).toInt(),
                     )
+                    cashedDoc[docId] = docContent
+
                     RecommendationDoc(
                         actionFlag = actionFlag,
                         docID = docId,
-                        content = docContent
+                        category = docContent.category,
+                        downloadResID = docContent.downloadResID,
+                        relevanceIndex = docContent.relevanceIndex
                     )
                 }
                 trySend(result)
@@ -51,7 +57,7 @@ class FirestoreRepository @Inject constructor(
 
 data class RecDocContent(
     val category: String,
-    val itemId: String,
+    val downloadResID: String,
     val marked: Boolean,
     val viewed: Boolean,
     val rated: Int?,
@@ -61,5 +67,8 @@ data class RecDocContent(
 data class RecommendationDoc(
     val actionFlag: String,
     val docID: String,
-    val content: RecDocContent,
+    val category: String,
+    val downloadResID: String,
+    val relevanceIndex: Int,
 )
+

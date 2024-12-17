@@ -19,7 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object MovieModule {
     @Provides
     @Singleton
-    fun provideGson(): Gson? {
+    fun provideGson(): Gson {
         return GsonBuilder()
             .setLenient()
             .create()
@@ -28,7 +28,7 @@ object MovieModule {
     @Provides
     @Singleton
     fun provideImageRDS(@ApplicationContext applicationContext: Context, gson: Gson): ODMbApiService {
-        val hostSource = "http://www.omdbapi.com"
+        val hostSource = "https://www.omdbapi.com"
         val retrofitBuilder = Retrofit
             .Builder()
             .baseUrl(hostSource)

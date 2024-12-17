@@ -1,6 +1,7 @@
 package com.example.network
 
 import android.content.Context
+import android.util.Log
 import javax.inject.Inject
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -11,6 +12,7 @@ import coil.request.SuccessResult
 import dagger.hilt.android.qualifiers.ApplicationContext
 import coil.ImageLoader
 import coil.request.CachePolicy
+import coil.request.ErrorResult
 
 class ImageLoader @Inject constructor(
     private val coilImageLoader: ImageLoader,
@@ -32,6 +34,8 @@ class ImageLoader @Inject constructor(
                 .toBitmap()
                 .asImageBitmap()
         } else {
+            if (result is ErrorResult)
+                Log.e("Coil exception", "${result.throwable}")
             null
         }
     }
