@@ -26,6 +26,7 @@ import kotlinx.serialization.Serializable
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.pulltorefresh.*
+import com.example.personal_feed.ui.PersonalFeed
 
 
 @Serializable object SelectionAuth
@@ -95,7 +96,7 @@ fun MainScreenWithBottomBar() {
                     state = pullToRefreshState
                 ) {}
         ) {
-            composable<RecFeed> {  }
+            composable<RecFeed> { PersonalFeed() }
             composable<PersonalList> {  }
             composable<Search> {  }
             composable<Profile> {  }

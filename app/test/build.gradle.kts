@@ -76,4 +76,5 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
     implementation("androidx.navigation:navigation-compose:2.8.3")
     implementation(project(":feature:auth"))
+    implementation(project(":feature:personal-feed"))
 }
