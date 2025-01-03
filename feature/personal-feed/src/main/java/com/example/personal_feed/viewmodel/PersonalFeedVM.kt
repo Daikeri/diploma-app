@@ -22,7 +22,6 @@ class PersonalFeedVM @Inject constructor(
     val authRepository: FBAuthRepository,
     val firestoreRepository: FirestoreRepository,
     val movieRepository: MovieRepository,
-    val savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow<PersonalFeedUiState?>(null)
@@ -72,8 +71,6 @@ class PersonalFeedVM @Inject constructor(
                                 }
                             }
                         )
-
-                        Log.e("${_uiState.value!!.contentFeed[0][0]}", "")
                     }
             }
         }
