@@ -149,39 +149,41 @@ fun CardDetailScreen(widthState: Dp, heightState:Dp, onClickBackButton: () -> Un
     }
 
 
-    LazyColumn(
-        modifier = Modifier
-            //.fillMaxSize()
-            .width(widthState)
-            .height(heightState)
-            .padding(horizontal = 10.dp),
-        state = listState
-    ) {
-        item {
-            MoviePoster(
-                onClickBackButton,
-                Modifier.padding(bottom = 8.dp),
-            )
-        }
-        
-        item {
-            TitleWithButton()
-        }
+    Surface(color = Color(0xFF141414), modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                //.fillMaxSize()
+                .width(widthState)
+                .height(heightState)
+                .padding(horizontal = 10.dp),
+            state = listState
+        ) {
+            item {
+                MoviePoster(
+                    onClickBackButton,
+                    Modifier.padding(bottom = 8.dp),
+                )
+            }
 
-        item {
-            TagBar()
-        }
+            item {
+                TitleWithButton()
+            }
 
-        item(key = "description") {
-            Description(isDescriptionExpand,onClickAtDescription)
-        }
+            item {
+                TagBar()
+            }
 
-        item {
-            Stub(R.drawable.peak_background)
-        }
-        
-        item {
-            Stub(imageId = R.drawable.blurry_background, modifier = Modifier.blur(50.dp))
+            item(key = "description") {
+                Description(isDescriptionExpand,onClickAtDescription)
+            }
+
+            item {
+                Stub(R.drawable.peak_background)
+            }
+
+            item {
+                Stub(imageId = R.drawable.blurry_background, modifier = Modifier.blur(50.dp))
+            }
         }
     }
 }
@@ -236,11 +238,13 @@ fun MoviePoster(
                     .align(Alignment.TopStart)
                     .padding(top = 4.dp, start = 4.dp)
                 ,
-                colors = IconButtonDefaults.iconButtonColors(containerColor = Color(0xFFF8F9FA))
+                colors = IconButtonDefaults.iconButtonColors(containerColor = Color(0xFFFFFFFF).copy(alpha = 0.2f)) // 0xFFFFFFFF 0xFF141414
             ) {
                 Icon(
+                    modifier = Modifier.alpha(1.0f),
+                    tint = Color(0xFFFFFFFF),
                     imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
-                    contentDescription = null
+                    contentDescription = null,
                 )
             }
 
@@ -277,7 +281,6 @@ fun TitleWithButton(
     Row(
         modifier = Modifier
     ) {
-
         Text(
             modifier = Modifier
                 .width(225.dp)
@@ -285,14 +288,15 @@ fun TitleWithButton(
                 .padding(end = 8.dp)
             ,
             softWrap = true,
-            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+            fontFamily = FontFamily(Font(R.font.inter_18pt_bold)),
             text = title,
             style = textStyle,
             maxLines = 2,
             overflow = TextOverflow.Clip,
             onTextLayout = { textLayoutResult ->
                 currentLineNum = textLayoutResult.lineCount
-            }
+            },
+            color = Color(0xFFFFFFFF)
         )
 
         Row(
@@ -304,12 +308,12 @@ fun TitleWithButton(
                 shape = CircleShape,
                 contentPadding = PaddingValues(0.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF343A40), contentColor = Color.Unspecified),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF38E078), contentColor = Color.Unspecified),
                 onClick = { /*TODO*/ },
                 modifier = Modifier.padding(end = 6.dp)
             ) {
                 Icon(
-                    tint = Color.White,
+                    tint = Color(0xFF141414),
                     imageVector = ImageVector.vectorResource(id = R.drawable.bookmark_add_colorful),
                     contentDescription = null,
                 )
@@ -317,12 +321,12 @@ fun TitleWithButton(
 
             ElevatedButton(
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF343A40)),//0xFFF8F9FA
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF38E078)),//0xFFF8F9FA
                 onClick = { /*TODO*/ },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
-                    tint = Color.White, //0xFFCDB4DB
+                    tint = Color(0xFF141414), //0xFFCDB4DB
                     imageVector = ImageVector.vectorResource(id = R.drawable.star_24px),
                     contentDescription = null
                 )
@@ -359,7 +363,7 @@ fun TagBar() {
 fun TagItem(title: String, modifier: Modifier = Modifier) {
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color(0xFFE9ECEF), //0xFFE9ECEF 0xFFF8F9FA
+        color = Color(0xFF292929) , //0xFFE9ECEF 0xFFF8F9FA свежак - Color(0xFF292929)
         shadowElevation = 0.dp,
         modifier = Modifier
             .height(50.dp)
@@ -371,8 +375,10 @@ fun TagItem(title: String, modifier: Modifier = Modifier) {
         ) {
             Text(
                 style = MaterialTheme.typography.titleMedium,
+                color = Color(0xFFC4C4C4),
                 text = title,
-                modifier = Modifier//.padding(8.dp)
+                modifier = Modifier, //.padding(8.dp)
+                fontFamily = FontFamily(Font(R.font.inter_18pt_regular))
             )
         }
     }
@@ -434,7 +440,7 @@ fun Description(isExpand: Boolean, onClickAtDescription: () -> Unit) {
             .padding(top = 10.dp)
         ,
         shape = RoundedCornerShape(12.dp),
-        color = Color(0xFFF8F9FA), // 0xFFE9ECEF 0xFFF8F9FA
+        color = Color(0xFF292929), // 0xFFE9ECEF 0xFFF8F9FA
         shadowElevation = 4.dp
     ) {
         Box(
@@ -461,7 +467,9 @@ fun Description(isExpand: Boolean, onClickAtDescription: () -> Unit) {
                 textAlign = TextAlign.Start,
                 maxLines = if (isExpand) Int.MAX_VALUE else 5,
                 style = MaterialTheme.typography.bodyLarge,
-                text = description
+                text = description,
+                color = Color(0xFFFFFFFF),
+                fontFamily = FontFamily(Font(R.font.inter_18pt_regular))
             )
         }
     }

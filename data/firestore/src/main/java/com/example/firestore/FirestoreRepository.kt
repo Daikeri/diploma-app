@@ -8,12 +8,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
+import javax.inject.Singleton
 
-
+@Singleton
 class FirestoreRepository @Inject constructor(
     val firestoreRDS: FirebaseFirestore
 ) {
-    private val cashedDoc: MutableMap<String, RecDocContent> = mutableMapOf()
+    val cashedDoc: MutableMap<String, RecDocContent> = mutableMapOf()
 
     fun recommendation(firebaseUserID: String): Flow<List<RecommendationDoc>>
     = callbackFlow {

@@ -27,23 +27,20 @@ class CardDetailVM @Inject constructor(
         downloadResID: String,
         docID: String
     ) {
-        firestoreRepository.cashedDoc.collect { docCash ->
-            val itemContent = movieRepository.getMovie(downloadResID)
-            val itemMeta = docCash[docID]
-            Log.e("In CardDetailVm", "$docCash")
-            _uiState.value =  CardDetailUiState(
-                image = itemContent!!.downloadImage!!,
-                title = itemContent.title,
-                imdbScore = itemContent.imdbRating,
-                ageRating = itemContent.rated,
-                duration = itemContent.runtime,
-                director = itemContent.director,
-                genre = itemContent.genre,
-                description = itemContent.plot,
-                inPersonalList = itemMeta!!.marked,
-                userRating = itemMeta.rated
-            )
-        }
+        val itemContent = movieRepository.getMovie(downloadResID)
+        val itemMeta = firestoreRepository.cashedDoc[docID]
+        _uiState.value =  CardDetailUiState(
+            image = itemContent!!.downloadImage!!,
+            title = itemContent.title,
+            imdbScore = itemContent.imdbRating,
+            ageRating = itemContent.rated,
+            duration = itemContent.runtime,
+            director = itemContent.director,
+            genre = itemContent.genre,
+            description = itemContent.plot,
+            inPersonalList = itemMeta!!.marked,
+            userRating = itemMeta.rated
+        )
     }
 }
 
